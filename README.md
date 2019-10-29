@@ -1,7 +1,7 @@
 # tidycwl
 
 [![Travis build status](https://travis-ci.org/sbg/tidycwl.svg?branch=master)](https://travis-ci.org/sbg/tidycwl)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/nanxstats/tidycwl?branch=master&svg=true)](https://ci.appveyor.com/project/nanxstats/tidycwl)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/dp3rsacx9m10x6ei/branch/master?svg=true)](https://ci.appveyor.com/project/nanxstats/tidycwl)
 
 Read, parse, and visualize Common Workflow Language (CWL) tools and workflows.
 
