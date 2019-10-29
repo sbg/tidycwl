@@ -1,0 +1,109 @@
+---
+title: "A Grammar for Tidying CWL Workflows"
+author: "Nan Xiao <<nan.xiao@sevenbridges.com>>"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_document:
+    toc: true
+    toc_float: false
+    toc_depth: 4
+    number_sections: true
+    highlight: "pygments"
+    css: "custom.css"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{A Grammar for Tidying CWL Workflows}
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(comment = "")
+```
+
+# Introduction
+
+The tidycwl package takes the raw Common Workflow Language (CWL) workflows encoded in JSON or YAML, and turns the workflow elements into tidy data frames or structured lists. This package follows the [tidyverse design principles](https://principles.tidyverse.org/) and can be seamlessly used together with the other packages with similar designs.
+
+Let's use a real-world example to see how we can read, parse, and visualize a bioinformatics workflow with tidycwl.
+
+```{r}
+library("tidycwl")
+library("magrittr")
+```
+
+# Read workflow
+
+To read a CWL workflow into R, use `read_cwl_json()`, `read_cwl_yaml()`, or `read_cwl(format = ...)` depending on the workflow storage format.
+
+```{r}
+flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
+  read_cwl_json()
+flow
+```
+
+We see the name, class (workflow or command line tool), and the version of the CWL. Currently, tidycwl supports both sbg:draft2 and v1.0 workflows. As the standard evolves, we plan to add the support for higher versions as needed.
+
+# Parse workflow
+
+After reading the workflow into R, let's parse the main components from the CWL.
+
+Besides the type (`parse_type()`) and metadata (`parse_meta()`), we are more than interested in the core components of a workflow, namely, the inputs, outputs, and the intermediate steps.
+
+```{r}
+flow %>%
+  parse_inputs() %>%
+  names()
+
+flow %>%
+  parse_outputs() %>%
+  names()
+
+flow %>%
+  parse_steps() %>%
+  names()
+```
+
+Depending on whether these components are represented as YAML/JSON dictionaries or lists in the workflow, the parsed results could be data frames or lists. This is because we want to keep the transformations for the original data minimal, at least at this stage. Plus, these results are not too useful compared to the following granular parsers.
+
+# Get parameters
+
+We can use the `get_*_*()` functions to get the critical parameters, such as the ID, label, or documentation from the parsed inputs, outputs, and steps. For example, use `get_steps_label()` to get the labels of the steps in the workflow:
+
+```{r}
+flow %>%
+  parse_steps() %>%
+  get_steps_label()
+```
+
+# Get graph elements
+
+In many cases, it is useful to construct a graph with the parsed inputs, outputs, and steps from the workflow. The functions `get_nodes()` and `get_edges()` can help us tidy the graph nodes and edges into data frames. Each row represents a node or an edge, with each variable representing an attribute of the node or edge.
+
+The function `get_graph()` is a wrapper which returns everything in a list:
+
+```{r}
+get_graph(
+  flow %>% parse_inputs(),
+  flow %>% parse_outputs(),
+  flow %>% parse_steps()
+) %>% str()
+```
+
+# Visualize workflow
+
+With tidycwl, we can visualize the workflow graph by calling `visualize_graph()`, which is built on the `visNetwork` package with an automatic hierarchical layout.:
+
+```{r}
+get_graph(
+  flow %>% parse_inputs(),
+  flow %>% parse_outputs(),
+  flow %>% parse_steps()
+) %>% visualize_graph()
+```
+
+Users can interact with the visualization by zooming in/out and dragging the view or nodes. The graphical details can be further fine-tuned by feeding additional parameters to `visualize_graph()`.
+
+The visualizations can be exported as HTML or static images (PNG/JPEG/PDF) with `export_html()` and `export_image()`.
+
+# Shiny widget
+
+The workflow visualizations can be directly embedded in Shiny apps by using the Shiny widget in tidycwl. Check out the documentation for `render_cwl()` and `cwl_output()` for an example app.

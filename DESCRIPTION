@@ -1,0 +1,31 @@
+Package: tidycwl
+Type: Package
+Title: Tidy Common Workflow Language Tools and Workflows
+Version: 1.0.0
+Authors@R: c(
+    person("Nan", "Xiao", email = "nan.xiao@sevenbridges.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0250-5673")),
+    person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut")),
+    person("Dennis", "Dean", email = "dennis.dean@sevenbridges.com", role = c("aut")),
+    person("Seven Bridges Genomics", role = c("cph", "fnd"))
+    )
+Maintainer: Nan Xiao <nan.xiao@sevenbridges.com>
+Description: Read, parse, and render Common Workflow Language tools and workflows.
+License: AGPL-3 | file LICENSE
+VignetteBuilder: knitr
+URL: https://sbg.github.io/tidycwl/, https://github.com/sbg/tidycwl
+BugReports: https://github.com/sbg/tidycwl/issues
+Encoding: UTF-8
+LazyData: true
+Imports:
+    jsonlite,
+    yaml,
+    dplyr,
+    magrittr,
+    visNetwork,
+    htmlwidgets,
+    webshot
+Suggests:
+    knitr,
+    rmarkdown
+RoxygenNote: 6.1.1

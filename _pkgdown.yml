@@ -1,0 +1,55 @@
+template:
+  params:
+    ganalytics: UA-87185344-1
+
+reference:
+  - title: "Read workflows"
+    contents:
+      - read_cwl
+      - read_cwl_json
+      - read_cwl_yaml
+  - title: "Parse workflows"
+    contents:
+      - parse_type
+      - parse_meta
+      - parse_inputs
+      - parse_outputs
+      - parse_steps
+      - parse_cwl
+  - title: "Get parameters in workflows"
+    contents:
+      - get_cwl_version
+      - get_inputs_id
+      - get_inputs_label
+      - get_outputs_id
+      - get_outputs_label
+      - get_steps_id
+      - get_steps_label
+      - get_steps_doc
+      - get_steps_version
+      - get_steps_revision
+  - title: "Get graph elements in workflows"
+    contents:
+      - get_nodes
+      - get_edges
+      - get_graph
+  - title: "Visualize workflows"
+    contents:
+      - visualize_graph
+  - title: "Export workflow visualizations"
+    contents:
+      - export_html
+      - export_image
+  - title: "Shiny widget"
+    contents:
+      - cwl_output
+      - render_cwl
+  - title: "Utilities"
+    contents:
+      - is_cwl
+      - is_tool
+      - is_workflow
+      - is_draft2
+      - is_v1.0
+      - is_v1.1
+      - print.cwl

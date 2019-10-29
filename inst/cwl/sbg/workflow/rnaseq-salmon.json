@@ -1,0 +1,2583 @@
+{
+  "requirements": [
+    {
+      "class": "ScatterFeatureRequirement"
+    }
+  ],
+  "steps": [
+    {
+      "sbg:x": 1132.180350167411,
+      "out": [
+        {
+          "id": "expression_matrix"
+        }
+      ],
+      "in": [
+        {
+          "id": "output_name",
+          "default": "transcripts.expression_matrix.tpm.txt"
+        },
+        {
+          "source": [
+            "Salmon_Quant___Reads/quant_sf"
+          ],
+          "id": "abundance_estimates"
+        }
+      ],
+      "sbg:y": 255.92727661132847,
+      "run": {
+        "requirements": [
+          {
+            "class": "ShellCommandRequirement"
+          },
+          {
+            "ramMin": 1000,
+            "class": "ResourceRequirement",
+            "coresMin": 1
+          },
+          {
+            "class": "DockerRequirement",
+            "dockerPull": "images.sbgenomics.com/dusan_randjelovic/sci-python:2.7"
+          },
+          {
+            "class": "InitialWorkDirRequirement",
+            "listing": [
+              {
+                "entry": "import argparse\n\n\ndef parse_quant_file(quant_files, sample_ids, out_name, column_name):\n\n    # Open all files for reading and an output file for writing; make the header\n    handles = []\n    writer = open(out_name, 'w')\n    writer.write('Gene_or_Transcript_ID')\n    \n    k = 0\n    for item in quant_files:\n        sample_name = sample_ids[k]\n        k = k+1\n        suppl = open(item)\n        header = [x.lower() for x in suppl.next().rstrip().split('\\t')]\n        TPM_column = header.index(column_name)\n        #suppl.next()  # throw away the header\n        writer.write('\\t' + sample_name)\n        handles.append(suppl)\n\n    # Iterate over files and lines\n    eof = False\n    while not eof:\n        writer.write('\\n')\n        for i, suppl in enumerate(handles):\n            try:\n                items = suppl.next().rstrip().split('\\t')\n            except StopIteration:\n                eof = True\n                break\n            if i == 0:\n                writer.write('{}\\t{}'.format(items[0].split('|')[0], items[TPM_column]))\n            else:\n                writer.write('\\t' + items[TPM_column])\n\n    writer.close()\n\n\nif __name__ == '__main__':\n\n    parser = argparse.ArgumentParser(description='Parse a set of abundance estimate files into a matrix of TPM values.')\n    parser.add_argument('--input', '-i', help='Comma-separated list of abundance estimate input files.')\n    parser.add_argument('--sample_ids', '-s', help='Comma-separated list of sample_ids.')\n    parser.add_argument('--out', '-o', help='Output file name.')\n    parser.add_argument('--column_name', '-c', help='Column name chosen to aggregate results over')\n    args = parser.parse_args()\n\n    quant_inputs = args.input.split(',')\n    samples = args.sample_ids.split(',')\n    parse_quant_file(quant_files=quant_inputs, sample_ids=samples, out_name=args.out, column_name = args.column_name)",
+                "writable": false,
+                "entryname": "create_tpm_matrix.py"
+              }
+            ]
+          },
+          {
+            "class": "InlineJavascriptRequirement",
+            "expressionLib": [
+              "var updateMetadata = function(file, key, value) {\n    file['metadata'][key] = value;\n    return file;\n};\n\n\nvar setMetadata = function(file, metadata) {\n    if (!('metadata' in file))\n        file['metadata'] = metadata;\n    else {\n        for (var key in metadata) {\n            file['metadata'][key] = metadata[key];\n        }\n    }\n    return file\n};\n\nvar inheritMetadata = function(o1, o2) {\n    var commonMetadata = {};\n    if (!Array.isArray(o2)) {\n        o2 = [o2]\n    }\n    for (var i = 0; i < o2.length; i++) {\n        var example = o2[i]['metadata'];\n        for (var key in example) {\n            if (i == 0)\n                commonMetadata[key] = example[key];\n            else {\n                if (!(commonMetadata[key] == example[key])) {\n                    delete commonMetadata[key]\n                }\n            }\n        }\n    }\n    if (!Array.isArray(o1)) {\n        o1 = setMetadata(o1, commonMetadata)\n    } else {\n        for (var i = 0; i < o1.length; i++) {\n            o1[i] = setMetadata(o1[i], commonMetadata)\n        }\n    }\n    return o1;\n};\n\nvar toArray = function(file) {\n    return [].concat(file);\n};\n\nvar groupBy = function(files, key) {\n    var groupedFiles = [];\n    var tempDict = {};\n    for (var i = 0; i < files.length; i++) {\n        var value = files[i]['metadata'][key];\n        if (value in tempDict)\n            tempDict[value].push(files[i]);\n        else tempDict[value] = [files[i]];\n    }\n    for (var key in tempDict) {\n        groupedFiles.push(tempDict[key]);\n    }\n    return groupedFiles;\n};\n\nvar orderBy = function(files, key, order) {\n    var compareFunction = function(a, b) {\n        if (a['metadata'][key].constructor === Number) {\n            return a['metadata'][key] - b['metadata'][key];\n        } else {\n            var nameA = a['metadata'][key].toUpperCase();\n            var nameB = b['metadata'][key].toUpperCase();\n            if (nameA < nameB) {\n                return -1;\n            }\n            if (nameA > nameB) {\n                return 1;\n            }\n            return 0;\n        }\n    };\n\n    files = files.sort(compareFunction);\n    if (order == undefined || order == \"asc\")\n        return files;\n    else\n        return files.reverse();\n};"
+            ]
+          }
+        ],
+        "class": "CommandLineTool",
+        "baseCommand": [],
+        "sbg:sbgMaintained": false,
+        "cwlVersion": "v1.0",
+        "sbg:latestRevision": 11,
+        "label": "SBG Create Expression Matrix - Transcripts",
+        "doc": "This tool takes multiple abundance estimates files outputted by tools like RSEM, Kallisto or Salmon and creates a single expression counts matrix, based on the input column that the user specifies (the default is 'tpm', but any other string can be input here, like 'fpkm', 'counts' or similar), that can be used for further downstream analysis.\n\nThis tool can also be used to aggregate any kind of results in tab-delimited format and create a matrix like file, it was just originally developed for creating expression matrices. \n\n### Common Issues ###\nNone",
+        "id": "bix-demo/sbgtools-demo/sbg-create-rsem-tpm-counts-matrix/11",
+        "sbg:toolAuthor": "Seven Bridges Genomics",
+        "inputs": [
+          {
+            "type": "string?",
+            "sbg:toolDefaultValue": "'expression_matrix.txt'",
+            "sbg:category": "Options",
+            "doc": "name of the outputted TPM counts matrix file.",
+            "id": "output_name",
+            "label": "Output file name"
+          },
+          {
+            "type": "string?",
+            "sbg:toolDefaultValue": "'tpm'",
+            "label": "Column name",
+            "sbg:category": "Options",
+            "doc": "Column name chose to aggregate results over.",
+            "id": "column_name",
+            "inputBinding": {
+              "prefix": "--column_name",
+              "position": 4,
+              "shellQuote": false
+            },
+            "default": "tpm"
+          },
+          {
+            "type": "File[]?",
+            "label": "Abundance estimates",
+            "sbg:category": "Inputs",
+            "doc": "Abundance estimates generated by tools like RSEM, Kallisto or Salmon.",
+            "id": "abundance_estimates",
+            "format": "RESULTS, SF, TSV",
+            "inputBinding": {
+              "prefix": "-i",
+              "position": 1,
+              "itemSeparator": ",",
+              "shellQuote": false
+            },
+            "required": false
+          }
+        ],
+        "sbg:toolkitVersion": "v1.0",
+        "sbg:appVersion": [
+          "v1.0"
+        ],
+        "arguments": [
+          {
+            "position": 0,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "${\n    if ([].concat(inputs.abundance_estimates).length > 1) {\n        return \"python create_tpm_matrix.py\"\n    } else {\n        return \"echo 'Multiple samples not provided, doing passthrough'\"\n    }\n}"
+          },
+          {
+            "prefix": "",
+            "position": 2,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.abundance_estimates) {\n        var quants = [].concat(inputs.abundance_estimates)\n        var samples = []\n        if (quants[0] && quants[0].metadata && quants[0].metadata.sample_id) {\n            for (i = 0; i < quants.length; i++) {\n                samples = samples.concat(quants[i].metadata.sample_id)\n            }\n        } else {\n            for (i = 0; i < quants.length; i++) {\n                samples = samples.concat(quants[i].path.split('/').pop().split('.')[0])\n            }\n        }\n        return '--sample_ids ' + samples\n    }\n}"
+          },
+          {
+            "prefix": "",
+            "position": 3,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.abundance_estimates) {\n        var x = [].concat(inputs.abundance_estimates)\n        if (inputs.output_name) {\n            var suffix = inputs.output_name\n        } else {\n            var atr = inputs.column_name ? inputs.column_name : 'tpm'\n            var suffix = 'expression_matrix.' + atr + '.txt'\n        }\n        if (x.length == 1) {\n            if (x[0].metadata && x[0].metadata.sample_id) {\n                return '-o ' + x[0].metadata.sample_id + '.' + suffix\n            } else {\n                return '-o ' + x[0].path.split('/').pop().split('.')[0] + '.' + suffix\n            }\n        } else {\n            return '-o ' + suffix\n        }\n    }\n}"
+          }
+        ],
+        "sbg:categories": [
+          "Other"
+        ],
+        "sbg:contributors": [
+          "uros_sipetic"
+        ],
+        "sbg:id": "h-559a382d/h-f9938252/h-6885678a/0",
+        "sbg:cmdPreview": "python create_tpm_matrix.py  --sample_ids SAMPLEA,SAMPLEB",
+        "x": 1132.180350167411,
+        "sbg:createdBy": "uros_sipetic",
+        "outputs": [
+          {
+            "type": "File?",
+            "label": "Expression matrix",
+            "doc": "A single file containing expression values across all genes/transcripts for multiple provided inputs.",
+            "id": "expression_matrix",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.abundance_estimates)\n\n}",
+              "glob": "${\n    if (inputs.abundance_estimates) {\n        var x = [].concat(inputs.abundance_estimates)\n        if (inputs.output_name) {\n            var suffix = inputs.output_name\n        } else {\n            var atr = inputs.column_name ? inputs.column_name : 'tpm'\n            var suffix = 'expression_matrix.' + atr + '.txt'\n        }\n        if (x.length == 1) {\n            if (x[0].metadata && x[0].metadata.sample_id) {\n                return x[0].metadata.sample_id + '.' + suffix\n            } else {\n                return x[0].path.split('/').pop().split('.')[0] + '.' + suffix\n            }\n        } else {\n            return suffix\n        }\n    }\n}"
+            },
+            "format": "TXT"
+          }
+        ],
+        "y": 255.92727661132847,
+        "sbg:image_url": null,
+        "sbg:project": "bix-demo/sbgtools-demo",
+        "sbg:publisher": "sbg",
+        "sbg:license": "Apache License 2.0",
+        "sbg:revisionNotes": "Update output filename",
+        "sbg:validationErrors": [],
+        "sbg:toolkit": "SBGTools"
+      },
+      "label": "SBG Create Expression Matrix - Transcripts",
+      "id": "SBG_Create_Expression_Matrix___Transcripts"
+    },
+    {
+      "sbg:x": 1129.9248395647323,
+      "out": [
+        {
+          "id": "expression_matrix"
+        }
+      ],
+      "in": [
+        {
+          "id": "output_name",
+          "default": "genes.expression_matrix.tpm.txt"
+        },
+        {
+          "source": [
+            "Salmon_Quant___Reads/quant_genes_sf"
+          ],
+          "id": "abundance_estimates"
+        }
+      ],
+      "sbg:y": 407.2054399762839,
+      "run": {
+        "requirements": [
+          {
+            "class": "ShellCommandRequirement"
+          },
+          {
+            "ramMin": 1000,
+            "class": "ResourceRequirement",
+            "coresMin": 1
+          },
+          {
+            "class": "DockerRequirement",
+            "dockerPull": "images.sbgenomics.com/dusan_randjelovic/sci-python:2.7"
+          },
+          {
+            "class": "InitialWorkDirRequirement",
+            "listing": [
+              {
+                "entry": "import argparse\n\n\ndef parse_quant_file(quant_files, sample_ids, out_name, column_name):\n\n    # Open all files for reading and an output file for writing; make the header\n    handles = []\n    writer = open(out_name, 'w')\n    writer.write('Gene_or_Transcript_ID')\n    \n    k = 0\n    for item in quant_files:\n        sample_name = sample_ids[k]\n        k = k+1\n        suppl = open(item)\n        header = [x.lower() for x in suppl.next().rstrip().split('\\t')]\n        TPM_column = header.index(column_name)\n        #suppl.next()  # throw away the header\n        writer.write('\\t' + sample_name)\n        handles.append(suppl)\n\n    # Iterate over files and lines\n    eof = False\n    while not eof:\n        writer.write('\\n')\n        for i, suppl in enumerate(handles):\n            try:\n                items = suppl.next().rstrip().split('\\t')\n            except StopIteration:\n                eof = True\n                break\n            if i == 0:\n                writer.write('{}\\t{}'.format(items[0].split('|')[0], items[TPM_column]))\n            else:\n                writer.write('\\t' + items[TPM_column])\n\n    writer.close()\n\n\nif __name__ == '__main__':\n\n    parser = argparse.ArgumentParser(description='Parse a set of abundance estimate files into a matrix of TPM values.')\n    parser.add_argument('--input', '-i', help='Comma-separated list of abundance estimate input files.')\n    parser.add_argument('--sample_ids', '-s', help='Comma-separated list of sample_ids.')\n    parser.add_argument('--out', '-o', help='Output file name.')\n    parser.add_argument('--column_name', '-c', help='Column name chosen to aggregate results over')\n    args = parser.parse_args()\n\n    quant_inputs = args.input.split(',')\n    samples = args.sample_ids.split(',')\n    parse_quant_file(quant_files=quant_inputs, sample_ids=samples, out_name=args.out, column_name = args.column_name)",
+                "writable": false,
+                "entryname": "create_tpm_matrix.py"
+              }
+            ]
+          },
+          {
+            "class": "InlineJavascriptRequirement",
+            "expressionLib": [
+              "var updateMetadata = function(file, key, value) {\n    file['metadata'][key] = value;\n    return file;\n};\n\n\nvar setMetadata = function(file, metadata) {\n    if (!('metadata' in file))\n        file['metadata'] = metadata;\n    else {\n        for (var key in metadata) {\n            file['metadata'][key] = metadata[key];\n        }\n    }\n    return file\n};\n\nvar inheritMetadata = function(o1, o2) {\n    var commonMetadata = {};\n    if (!Array.isArray(o2)) {\n        o2 = [o2]\n    }\n    for (var i = 0; i < o2.length; i++) {\n        var example = o2[i]['metadata'];\n        for (var key in example) {\n            if (i == 0)\n                commonMetadata[key] = example[key];\n            else {\n                if (!(commonMetadata[key] == example[key])) {\n                    delete commonMetadata[key]\n                }\n            }\n        }\n    }\n    if (!Array.isArray(o1)) {\n        o1 = setMetadata(o1, commonMetadata)\n    } else {\n        for (var i = 0; i < o1.length; i++) {\n            o1[i] = setMetadata(o1[i], commonMetadata)\n        }\n    }\n    return o1;\n};\n\nvar toArray = function(file) {\n    return [].concat(file);\n};\n\nvar groupBy = function(files, key) {\n    var groupedFiles = [];\n    var tempDict = {};\n    for (var i = 0; i < files.length; i++) {\n        var value = files[i]['metadata'][key];\n        if (value in tempDict)\n            tempDict[value].push(files[i]);\n        else tempDict[value] = [files[i]];\n    }\n    for (var key in tempDict) {\n        groupedFiles.push(tempDict[key]);\n    }\n    return groupedFiles;\n};\n\nvar orderBy = function(files, key, order) {\n    var compareFunction = function(a, b) {\n        if (a['metadata'][key].constructor === Number) {\n            return a['metadata'][key] - b['metadata'][key];\n        } else {\n            var nameA = a['metadata'][key].toUpperCase();\n            var nameB = b['metadata'][key].toUpperCase();\n            if (nameA < nameB) {\n                return -1;\n            }\n            if (nameA > nameB) {\n                return 1;\n            }\n            return 0;\n        }\n    };\n\n    files = files.sort(compareFunction);\n    if (order == undefined || order == \"asc\")\n        return files;\n    else\n        return files.reverse();\n};"
+            ]
+          }
+        ],
+        "class": "CommandLineTool",
+        "baseCommand": [],
+        "sbg:sbgMaintained": false,
+        "cwlVersion": "v1.0",
+        "sbg:latestRevision": 11,
+        "label": "SBG Create Expression Matrix - Genes",
+        "doc": "This tool takes multiple abundance estimates files outputted by tools like RSEM, Kallisto or Salmon and creates a single expression counts matrix, based on the input column that the user specifies (the default is 'tpm', but any other string can be input here, like 'fpkm', 'counts' or similar), that can be used for further downstream analysis.\n\nThis tool can also be used to aggregate any kind of results in tab-delimited format and create a matrix like file, it was just originally developed for creating expression matrices. \n\n### Common Issues ###\nNone",
+        "id": "bix-demo/sbgtools-demo/sbg-create-rsem-tpm-counts-matrix/11",
+        "sbg:toolAuthor": "Seven Bridges Genomics",
+        "inputs": [
+          {
+            "type": "string?",
+            "sbg:toolDefaultValue": "'expression_matrix.txt'",
+            "sbg:category": "Options",
+            "doc": "name of the outputted TPM counts matrix file.",
+            "id": "output_name",
+            "label": "Output file name"
+          },
+          {
+            "type": "string?",
+            "sbg:toolDefaultValue": "'tpm'",
+            "label": "Column name",
+            "sbg:category": "Options",
+            "doc": "Column name chose to aggregate results over.",
+            "id": "column_name",
+            "inputBinding": {
+              "prefix": "--column_name",
+              "position": 4,
+              "shellQuote": false
+            },
+            "default": "tpm"
+          },
+          {
+            "type": "File[]?",
+            "label": "Abundance estimates",
+            "sbg:category": "Inputs",
+            "doc": "Abundance estimates generated by tools like RSEM, Kallisto or Salmon.",
+            "id": "abundance_estimates",
+            "format": "RESULTS, SF, TSV",
+            "inputBinding": {
+              "prefix": "-i",
+              "position": 1,
+              "itemSeparator": ",",
+              "shellQuote": false
+            },
+            "required": false
+          }
+        ],
+        "sbg:toolkitVersion": "v1.0",
+        "sbg:appVersion": [
+          "v1.0"
+        ],
+        "arguments": [
+          {
+            "position": 0,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "${\n    if ([].concat(inputs.abundance_estimates).length > 1) {\n        return \"python create_tpm_matrix.py\"\n    } else {\n        return \"echo 'Multiple samples not provided, doing passthrough'\"\n    }\n}"
+          },
+          {
+            "prefix": "",
+            "position": 2,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.abundance_estimates) {\n        var quants = [].concat(inputs.abundance_estimates)\n        var samples = []\n        if (quants[0] && quants[0].metadata && quants[0].metadata.sample_id) {\n            for (i = 0; i < quants.length; i++) {\n                samples = samples.concat(quants[i].metadata.sample_id)\n            }\n        } else {\n            for (i = 0; i < quants.length; i++) {\n                samples = samples.concat(quants[i].path.split('/').pop().split('.')[0])\n            }\n        }\n        return '--sample_ids ' + samples\n    }\n}"
+          },
+          {
+            "prefix": "",
+            "position": 3,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.abundance_estimates) {\n        var x = [].concat(inputs.abundance_estimates)\n        if (inputs.output_name) {\n            var suffix = inputs.output_name\n        } else {\n            var atr = inputs.column_name ? inputs.column_name : 'tpm'\n            var suffix = 'expression_matrix.' + atr + '.txt'\n        }\n        if (x.length == 1) {\n            if (x[0].metadata && x[0].metadata.sample_id) {\n                return '-o ' + x[0].metadata.sample_id + '.' + suffix\n            } else {\n                return '-o ' + x[0].path.split('/').pop().split('.')[0] + '.' + suffix\n            }\n        } else {\n            return '-o ' + suffix\n        }\n    }\n}"
+          }
+        ],
+        "sbg:categories": [
+          "Other"
+        ],
+        "sbg:contributors": [
+          "uros_sipetic"
+        ],
+        "sbg:id": "h-c180d445/h-c47b722b/h-cc612c5b/0",
+        "sbg:cmdPreview": "python create_tpm_matrix.py  --sample_ids SAMPLEA,SAMPLEB",
+        "x": 1129.9248395647323,
+        "sbg:createdBy": "uros_sipetic",
+        "outputs": [
+          {
+            "type": "File?",
+            "label": "Expression matrix",
+            "doc": "A single file containing expression values across all genes/transcripts for multiple provided inputs.",
+            "id": "expression_matrix",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.abundance_estimates)\n\n}",
+              "glob": "${\n    if (inputs.abundance_estimates) {\n        var x = [].concat(inputs.abundance_estimates)\n        if (inputs.output_name) {\n            var suffix = inputs.output_name\n        } else {\n            var atr = inputs.column_name ? inputs.column_name : 'tpm'\n            var suffix = 'expression_matrix.' + atr + '.txt'\n        }\n        if (x.length == 1) {\n            if (x[0].metadata && x[0].metadata.sample_id) {\n                return x[0].metadata.sample_id + '.' + suffix\n            } else {\n                return x[0].path.split('/').pop().split('.')[0] + '.' + suffix\n            }\n        } else {\n            return suffix\n        }\n    }\n}"
+            },
+            "format": "TXT"
+          }
+        ],
+        "y": 407.2054399762839,
+        "sbg:image_url": null,
+        "sbg:project": "bix-demo/sbgtools-demo",
+        "sbg:publisher": "sbg",
+        "sbg:license": "Apache License 2.0",
+        "sbg:revisionNotes": "Update output filename",
+        "sbg:validationErrors": [],
+        "sbg:toolkit": "SBGTools"
+      },
+      "label": "SBG Create Expression Matrix - Genes",
+      "id": "SBG_Create_Expression_Matrix___Genes"
+    },
+    {
+      "sbg:x": -2.201730489730835,
+      "out": [
+        {
+          "id": "tuple_list"
+        },
+        {
+          "id": "number_of_elements"
+        }
+      ],
+      "in": [
+        {
+          "source": [
+            "reads"
+          ],
+          "id": "fastq_list"
+        },
+        {
+          "id": "number_of_cpus",
+          "default": 36
+        },
+        {
+          "source": "max_number_of_parallel_jobs",
+          "id": "max_number_of_parallel_jobs"
+        }
+      ],
+      "sbg:y": 351.447509765625,
+      "run": {
+        "requirements": [
+          {
+            "class": "ShellCommandRequirement"
+          },
+          {
+            "ramMin": 1024,
+            "class": "ResourceRequirement",
+            "coresMin": 1
+          },
+          {
+            "class": "DockerRequirement",
+            "dockerImageId": "d41a0837ab81",
+            "dockerPull": "images.sbgenomics.com/sevenbridges/alpine:3.8"
+          },
+          {
+            "class": "InitialWorkDirRequirement",
+            "listing": [
+              "$(inputs.fastq_list)"
+            ]
+          },
+          {
+            "class": "InlineJavascriptRequirement",
+            "expressionLib": [
+              "var updateMetadata = function(file, key, value) {\n    file['metadata'][key] = value;\n    return file;\n};\n\n\nvar setMetadata = function(file, metadata) {\n    if (!('metadata' in file))\n        file['metadata'] = metadata;\n    else {\n        for (var key in metadata) {\n            file['metadata'][key] = metadata[key];\n        }\n    }\n    return file\n};\n\nvar inheritMetadata = function(o1, o2) {\n    var commonMetadata = {};\n    if (!Array.isArray(o2)) {\n        o2 = [o2]\n    }\n    for (var i = 0; i < o2.length; i++) {\n        var example = o2[i]['metadata'];\n        for (var key in example) {\n            if (i == 0)\n                commonMetadata[key] = example[key];\n            else {\n                if (!(commonMetadata[key] == example[key])) {\n                    delete commonMetadata[key]\n                }\n            }\n        }\n    }\n    if (!Array.isArray(o1)) {\n        o1 = setMetadata(o1, commonMetadata)\n    } else {\n        for (var i = 0; i < o1.length; i++) {\n            o1[i] = setMetadata(o1[i], commonMetadata)\n        }\n    }\n    return o1;\n};\n\nvar toArray = function(file) {\n    return [].concat(file);\n};\n\nvar groupBy = function(files, key) {\n    var groupedFiles = [];\n    var tempDict = {};\n    for (var i = 0; i < files.length; i++) {\n        var value = files[i]['metadata'][key];\n        if (value in tempDict)\n            tempDict[value].push(files[i]);\n        else tempDict[value] = [files[i]];\n    }\n    for (var key in tempDict) {\n        groupedFiles.push(tempDict[key]);\n    }\n    return groupedFiles;\n};\n\nvar orderBy = function(files, key, order) {\n    var compareFunction = function(a, b) {\n        if (a['metadata'][key].constructor === Number) {\n            return a['metadata'][key] - b['metadata'][key];\n        } else {\n            var nameA = a['metadata'][key].toUpperCase();\n            var nameB = b['metadata'][key].toUpperCase();\n            if (nameA < nameB) {\n                return -1;\n            }\n            if (nameA > nameB) {\n                return 1;\n            }\n            return 0;\n        }\n    };\n\n    files = files.sort(compareFunction);\n    if (order == undefined || order == \"asc\")\n        return files;\n    else\n        return files.reverse();\n};"
+            ]
+          }
+        ],
+        "class": "CommandLineTool",
+        "baseCommand": [
+          "echo"
+        ],
+        "sbg:sbgMaintained": false,
+        "cwlVersion": "v1.0",
+        "sbg:latestRevision": 1,
+        "label": "SBG Pair FASTQs by Metadata",
+        "doc": "Tool accepts list of FASTQ files groups them into separate lists. This grouping is done using metadata values and their hierarchy (Sample ID > Library ID > Platform unit ID > File segment number) which should create unique combinations for each pair of FASTQ files. Important metadata fields are Sample ID, Library ID, Platform unit ID and File segment number. Not all of these four metadata fields are required, but the present set has to be sufficient to create unique combinations for each pair of FASTQ files. Files with no paired end metadata are grouped in the same way as the ones with paired end metadata, generally they should be alone in a separate list. Files with no metadata set will be grouped together. \n\nIf there are more than two files in a group, this might create errors further down most pipelines and the user should check if the metadata fields for those files are set properly.",
+        "id": "uros_sipetic/salmon-workflow-0-9-1-demo/sbg-pair-fastqs-by-metadata-custom/1",
+        "sbg:toolAuthor": "",
+        "inputs": [
+          {
+            "type": "File[]",
+            "label": "List of FASTQ files",
+            "doc": "List of the FASTQ files with properly set metadata fileds.",
+            "id": "fastq_list"
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "32",
+            "sbg:category": "Options",
+            "doc": "Number of CPUs available in the workflow that uses this tool. This number will be used to determine the optimal number of threads to use in the tool downstream of this one.",
+            "id": "number_of_cpus",
+            "label": "Number of CPUs"
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "4",
+            "sbg:category": "Options",
+            "doc": "Maximum number of parallel jobs to allow in the tool downstream of this one.",
+            "id": "max_number_of_parallel_jobs",
+            "label": "Maximum number of parallel jobs"
+          }
+        ],
+        "sbg:revisionNotes": "Add support for better multi-threading of downstream tools.",
+        "sbg:appVersion": [
+          "v1.0"
+        ],
+        "arguments": [
+          {
+            "position": 1,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "'Pairing"
+          },
+          {
+            "position": 2,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "FASTQs!'"
+          }
+        ],
+        "sbg:categories": [
+          "Converters",
+          "Other"
+        ],
+        "sbg:contributors": [
+          "uros_sipetic"
+        ],
+        "sbg:id": "h-017ff9df/h-11a15786/h-5789a45b/0",
+        "sbg:cmdPreview": "echo 'Pairing FASTQs!'",
+        "x": 613.6842105263158,
+        "sbg:createdBy": "uros_sipetic",
+        "outputs": [
+          {
+            "type": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": "File"
+              }
+            },
+            "label": "List of grouped FASTQ files",
+            "doc": "List of grouped FASTQ files by metadata fields.",
+            "id": "tuple_list",
+            "outputBinding": {
+              "outputEval": "${\n    function get_meta_map(m, file, meta) {\n        if (meta in file.metadata) {\n            return m[file.metadata[meta]]\n        } else {\n            return m['Undefined']\n        }\n    }\n\n    function create_new_map(map, file, meta) {\n        if (meta in file.metadata) {\n            map[file.metadata[meta]] = {}\n            return map[file.metadata[meta]]\n        } else {\n            map['Undefined'] = {}\n            return map['Undefined']\n        }\n    }\n\n    arr = [].concat(inputs.fastq_list)\n    map = {}\n\n    for (i in arr) {\n\n        sm_map = get_meta_map(map, arr[i], 'sample_id')\n        if (!sm_map) sm_map = create_new_map(map, arr[i], 'sample_id')\n\n        lb_map = get_meta_map(sm_map, arr[i], 'library_id')\n        if (!lb_map) lb_map = create_new_map(sm_map, arr[i], 'library_id')\n\n        pu_map = get_meta_map(lb_map, arr[i], 'platform_unit_id')\n        if (!pu_map) pu_map = create_new_map(lb_map, arr[i], 'platform_unit_id')\n\n        if ('file_segment_number' in arr[i].metadata) {\n            if (pu_map[arr[i].metadata['file_segment_number']]) {\n                a = pu_map[arr[i].metadata['file_segment_number']]\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map[arr[i].metadata['file_segment_number']] = ar\n            } else pu_map[arr[i].metadata['file_segment_number']] = [].concat(arr[i])\n        } else {\n            if (pu_map['Undefined']) {\n                a = pu_map['Undefined']\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map['Undefined'] = ar\n            } else {\n                pu_map['Undefined'] = [].concat(arr[i])\n            }\n        }\n    }\n    tuple_list = []\n    for (sm in map)\n        for (lb in map[sm])\n            for (pu in map[sm][lb]) {\n                for (fsm in map[sm][lb][pu]) {\n                    list = map[sm][lb][pu][fsm]\n                    tuple_list.push(list)\n                }\n            }\n    return tuple_list\n}"
+            }
+          },
+          {
+            "type": "int?",
+            "label": "Number of elements",
+            "doc": "Number of paired elements created from the input FASTQs",
+            "id": "number_of_elements",
+            "outputBinding": {
+              "outputEval": "${\n    function get_meta_map(m, file, meta) {\n        if (meta in file.metadata) {\n            return m[file.metadata[meta]]\n        } else {\n            return m['Undefined']\n        }\n    }\n\n    function create_new_map(map, file, meta) {\n        if (meta in file.metadata) {\n            map[file.metadata[meta]] = {}\n            return map[file.metadata[meta]]\n        } else {\n            map['Undefined'] = {}\n            return map['Undefined']\n        }\n    }\n\n    arr = [].concat(inputs.fastq_list)\n    map = {}\n\n    for (i in arr) {\n\n        sm_map = get_meta_map(map, arr[i], 'sample_id')\n        if (!sm_map) sm_map = create_new_map(map, arr[i], 'sample_id')\n\n        lb_map = get_meta_map(sm_map, arr[i], 'library_id')\n        if (!lb_map) lb_map = create_new_map(sm_map, arr[i], 'library_id')\n\n        pu_map = get_meta_map(lb_map, arr[i], 'platform_unit_id')\n        if (!pu_map) pu_map = create_new_map(lb_map, arr[i], 'platform_unit_id')\n\n        if ('file_segment_number' in arr[i].metadata) {\n            if (pu_map[arr[i].metadata['file_segment_number']]) {\n                a = pu_map[arr[i].metadata['file_segment_number']]\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map[arr[i].metadata['file_segment_number']] = ar\n            } else pu_map[arr[i].metadata['file_segment_number']] = [].concat(arr[i])\n        } else {\n            if (pu_map['Undefined']) {\n                a = pu_map['Undefined']\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map['Undefined'] = ar\n            } else {\n                pu_map['Undefined'] = [].concat(arr[i])\n            }\n        }\n    }\n    tuple_list = []\n    for (sm in map)\n        for (lb in map[sm])\n            for (pu in map[sm][lb]) {\n                for (fsm in map[sm][lb][pu]) {\n                    list = map[sm][lb][pu][fsm]\n                    tuple_list.push(list)\n                }\n            }\n\n    var number_of_cpus = inputs.number_of_cpus ? inputs.number_of_cpus : 32\n    var threads = Math.floor(number_of_cpus / tuple_list.length)\n    return threads < number_of_cpus / inputs.max_number_of_parallel_jobs ? Math.floor(number_of_cpus / inputs.max_number_of_parallel_jobs) : threads\n}"
+            }
+          }
+        ],
+        "y": 373.0701647306744,
+        "sbg:image_url": null,
+        "sbg:project": "uros_sipetic/salmon-workflow-0-9-1-demo",
+        "sbg:publisher": "sbg",
+        "appUrl": "/u/uros_sipetic/salmon-workflow-0-9-1-demo/apps/#uros_sipetic/salmon-workflow-0-9-1-demo/sbg-pair-fastqs-by-metadata-custom/1",
+        "sbg:license": "Apache License 2.0",
+        "sbg:validationErrors": [],
+        "sbg:toolkit": "SBGTools"
+      },
+      "label": "SBG Pair FASTQs by Metadata",
+      "id": "SBG_Pair_FASTQs_by_Metadata_1"
+    },
+    {
+      "sbg:x": 2.570194721221924,
+      "out": [
+        {
+          "id": "salmon_index_archive"
+        }
+      ],
+      "in": [
+        {
+          "source": "gencode",
+          "id": "gencode"
+        },
+        {
+          "source": "keep_duplicates",
+          "id": "keep_duplicates"
+        },
+        {
+          "id": "threads",
+          "default": 32
+        },
+        {
+          "source": "transcriptome_fasta_or_salmon_index_archive",
+          "id": "transcripts"
+        },
+        {
+          "source": "kmer_length",
+          "id": "kmer_length"
+        }
+      ],
+      "sbg:y": 198.0526885986328,
+      "run": {
+        "requirements": [
+          {
+            "class": "ShellCommandRequirement"
+          },
+          {
+            "ramMin": 7500,
+            "class": "ResourceRequirement",
+            "coresMin": "${\n    return inputs.threads ? inputs.threads : 8\n}"
+          },
+          {
+            "class": "DockerRequirement",
+            "dockerImageId": "ea69041ddb8d42ee13362fe71f1149e5044edbd7cbf66ef4a1919f8736777007",
+            "dockerPull": "images.sbgenomics.com/uros_sipetic/salmon:0.9.1"
+          },
+          {
+            "class": "InitialWorkDirRequirement",
+            "listing": [
+              "$(inputs.transcripts)"
+            ]
+          },
+          {
+            "class": "InlineJavascriptRequirement",
+            "expressionLib": [
+              "var updateMetadata = function(file, key, value) {\n    file['metadata'][key] = value;\n    return file;\n};\n\n\nvar setMetadata = function(file, metadata) {\n    if (!('metadata' in file))\n        file['metadata'] = metadata;\n    else {\n        for (var key in metadata) {\n            file['metadata'][key] = metadata[key];\n        }\n    }\n    return file\n};\n\nvar inheritMetadata = function(o1, o2) {\n    var commonMetadata = {};\n    if (!Array.isArray(o2)) {\n        o2 = [o2]\n    }\n    for (var i = 0; i < o2.length; i++) {\n        var example = o2[i]['metadata'];\n        for (var key in example) {\n            if (i == 0)\n                commonMetadata[key] = example[key];\n            else {\n                if (!(commonMetadata[key] == example[key])) {\n                    delete commonMetadata[key]\n                }\n            }\n        }\n    }\n    if (!Array.isArray(o1)) {\n        o1 = setMetadata(o1, commonMetadata)\n    } else {\n        for (var i = 0; i < o1.length; i++) {\n            o1[i] = setMetadata(o1[i], commonMetadata)\n        }\n    }\n    return o1;\n};\n\nvar toArray = function(file) {\n    return [].concat(file);\n};\n\nvar groupBy = function(files, key) {\n    var groupedFiles = [];\n    var tempDict = {};\n    for (var i = 0; i < files.length; i++) {\n        var value = files[i]['metadata'][key];\n        if (value in tempDict)\n            tempDict[value].push(files[i]);\n        else tempDict[value] = [files[i]];\n    }\n    for (var key in tempDict) {\n        groupedFiles.push(tempDict[key]);\n    }\n    return groupedFiles;\n};\n\nvar orderBy = function(files, key, order) {\n    var compareFunction = function(a, b) {\n        if (a['metadata'][key].constructor === Number) {\n            return a['metadata'][key] - b['metadata'][key];\n        } else {\n            var nameA = a['metadata'][key].toUpperCase();\n            var nameB = b['metadata'][key].toUpperCase();\n            if (nameA < nameB) {\n                return -1;\n            }\n            if (nameA > nameB) {\n                return 1;\n            }\n            return 0;\n        }\n    };\n\n    files = files.sort(compareFunction);\n    if (order == undefined || order == \"asc\")\n        return files;\n    else\n        return files.reverse();\n};"
+            ]
+          }
+        ],
+        "class": "CommandLineTool",
+        "baseCommand": [],
+        "sbg:sbgMaintained": false,
+        "cwlVersion": "v1.0",
+        "sbg:latestRevision": 12,
+        "label": "Salmon Index",
+        "doc": "**Salmon Index** tool builds an index from a transcriptome FASTA formatted file of target sequences, necessary for the **Salmon Quant** tool.  \n\n**Quasi-mapping** is a process of assigning reads to transcripts, without doing the exact base-to-base alignment. Seeing that for estimating transcript abundances, the main information needed is which transcript a read originates from and not the actual mapping coordinates, the idea with the **Salmon** tool was to implement a procedure that does exactly that [1, 2]. \n\nThe result is a software running at speeds orders of magnitude faster than other tools which utilize the full likelihood model, while keeping near-optimal probabilistic RNA-seq quantification results [1, 2]. \n\n*A list of **all inputs and parameters** with corresponding descriptions can be found at the bottom of the page.*\n\n### Common Use Cases\n\n- A **Transcriptome FASTA file** needs to be provided as an input to the tool. \n\n### Changes Introduced by Seven Bridges\n\n- An already generated **Salmon index archive** can be provided to the **Salmon Index** tool (**Transcriptome FASTA or Salmon Index Archive** input), in order to skip indexing and save a little bit of time if this tool is part of a bigger workflow and there already is an index file that can be provided.\n\n### Common Issues and Important Notes\n\n- The input FASTA file (if provided instead of the already generated salmon index) should be a transcriptome FASTA, not a genomic FASTA.\n\n### Performance Benchmarking\n\nThe **Salmon Index** tool builds the index structure for **Salmon** in a very short time, therefore it is expected that all tasks using this tool should finish in under 5 minutes, costing around $0.05 on the default c4.2xlarge instance (AWS). \n\n*Cost can be significantly reduced by using **spot instances**. Visit the [Knowledge Center](https://docs.sevenbridges.com/docs/about-spot-instances) for more details.*\n\n\n### References\n\n[1] [Salmon paper](biorxiv.org/content/biorxiv/early/2016/08/30/021592.full.pdf)  \n[2] [Rapmap paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4908361/)",
+        "id": "uros_sipetic/salmon-0-9-1-demo/salmon-index-0-9-1/12",
+        "sbg:toolAuthor": "Rob Patro, Carl Kingsford, Steve Mount, Mohsen Zakeri",
+        "inputs": [
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "sbg:category": "Options",
+            "doc": "This flag will expect the input transcript FASTA to be in GENCODE format and will split the transcript name at the first '|' character. These reduced names will be used in the output and when looking for these transcripts in a gene to transcript GTF.",
+            "id": "gencode",
+            "label": "GENCODE FASTA"
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Keep duplicates",
+            "sbg:category": "Options",
+            "doc": "This flag will disable the default indexing behavior of discarding sequence-identical duplicate transcripts. If this flag is passed, then duplicate transcripts that appear in the input will be retained and quantified separately.",
+            "id": "keep_duplicates",
+            "inputBinding": {
+              "prefix": "--keepDuplicates",
+              "position": 9,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "8",
+            "label": "Number of threads",
+            "sbg:category": "Basic options",
+            "doc": "Number of threads to be used.",
+            "id": "threads",
+            "inputBinding": {
+              "prefix": "-p",
+              "position": 8,
+              "shellQuote": false
+            },
+            "default": 8
+          },
+          {
+            "type": [
+              "null",
+              {
+                "symbols": [
+                  "quasi",
+                  "fmd"
+                ],
+                "name": "index_type",
+                "type": "enum"
+              }
+            ],
+            "sbg:toolDefaultValue": "quasi",
+            "label": "Index type",
+            "sbg:category": "Options",
+            "doc": "The type of index to build. Options are 'fmd' and 'quasi'. The former is for the SMEM based lightweight alignment (older) and the later is for the quasi-mapping (newer). 'Quasi' is recommended and 'fmd' may be removed in the future.",
+            "id": "index_type",
+            "inputBinding": {
+              "prefix": "--type",
+              "position": 3,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "1",
+            "label": "Sufix array sample",
+            "sbg:category": "Options",
+            "doc": "The interval at which the suffix array should be sampled. Smaller values are faster, but produce a larger index. The default value should be OK, unless Your transcriptome is huge. This value should be a power of 2.",
+            "id": "sa_samp",
+            "inputBinding": {
+              "prefix": "-s",
+              "position": 5,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Perfect hash",
+            "sbg:category": "options",
+            "doc": "This option is for quasi index only. Build the index using a perfect hash rather than a dense hash. This will require less memory (especially during quantification), but will take longer to construct.",
+            "id": "perfect_hash",
+            "inputBinding": {
+              "prefix": "--perfectHash",
+              "position": 7,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "File",
+            "label": "Transcriptome FASTA or Salmon Index",
+            "sbg:category": "Options",
+            "doc": "Transcriptome FASTA file, or an already generated Salmon index archive.",
+            "id": "transcripts",
+            "format": "FASTA,FA,TAR,FASTA.GZ,FA.GZ",
+            "inputBinding": {
+              "prefix": "-t",
+              "position": 1,
+              "shellQuote": false
+            },
+            "required": true
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "31",
+            "label": "K-mer length",
+            "sbg:category": "Options",
+            "doc": "The size of k-mers that should be used for the quasi index. K-mer length should be an odd number.",
+            "id": "kmer_length",
+            "inputBinding": {
+              "prefix": "-k",
+              "position": 4,
+              "shellQuote": false
+            }
+          }
+        ],
+        "sbg:toolkitVersion": "0.9.1",
+        "sbg:appVersion": [
+          "v1.0"
+        ],
+        "arguments": [
+          {
+            "position": 0,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "${\n    var x = [].concat(inputs.transcripts)[0].path.split('/').pop()\n    var y = x.split('.').pop().toLowerCase()\n    if (y == 'fa' || y == 'fasta' || y == 'gz') {\n        return \"salmon index\"\n    } else if (y == 'tar' || y == 'TAR') {\n        return \"echo 'Tar bundle provided, skipping indexing.' \"\n    }\n}"
+          },
+          {
+            "position": 100,
+            "shellQuote": false,
+            "valueFrom": "${\n    var fa = [].concat(inputs.transcripts)[0]\n    if (fa.path.toLowerCase().endsWith('gz')) {\n        var str = fa.path.split('/').pop().split('.').slice(0, -2).join('.')\n    } else {\n        var str = fa.path.split('/').pop().split('.').slice(0, -1).join('.')\n    }\n    var x1 = str + \"_salmon_index\"\n\n    var ext = fa.path.split('/').pop().split('.').pop()\n    if (ext.toLowerCase() == 'tar') {\n        return \"\"\n    } else {\n        return \"&& tar -vcf \" + str + \".salmon-0.9.1-index-archive.tar \" + x1\n    }\n\n}"
+          },
+          {
+            "prefix": "-i",
+            "position": 2,
+            "shellQuote": false,
+            "valueFrom": "${\n    var fa = [].concat(inputs.transcripts)[0]\n    if (fa.path.toLowerCase().endsWith('gz')) {\n        var str = fa.path.split('/').pop().split('.').slice(0, -2).join('.')\n    } else {\n        var str = fa.path.split('/').pop().split('.').slice(0, -1).join('.')\n    }\n    return str + \"_salmon_index\"\n}"
+          },
+          {
+            "position": 6,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.gencode) {\n        return \"--gencode\"\n    } else if ([].concat(inputs.transcripts)[0].path.toLowerCase().indexOf('gencode') !== -1) {\n        return \"--gencode\"\n    } else {\n        return \"\"\n    }\n}"
+          }
+        ],
+        "sbg:categories": [
+          "RNA",
+          "Indexing"
+        ],
+        "sbg:contributors": [
+          "uros_sipetic",
+          "anamijalkovic"
+        ],
+        "sbg:id": "admin/sbg-public-data/salmon-index-0-9-1/12",
+        "sbg:cmdPreview": "salmon index -t /path/to/transcripts.gencode.fa.gz -i transcripts.gencode_salmon_index  && tar -vcf transcripts.gencode.salmon-0.9.1-index-archive.tar transcripts.gencode_salmon_index",
+        "x": 614.1699539987665,
+        "sbg:createdBy": "uros_sipetic",
+        "outputs": [
+          {
+            "type": "File?",
+            "label": "Salmon index archive",
+            "doc": "Folder containing the indices from the specified alignment process (quasi or SMEM). To be used by Salmon Quant tool.",
+            "id": "salmon_index_archive",
+            "outputBinding": {
+              "outputEval": "${\n    self = inheritMetadata(self[0], inputs.transcripts)\n    var fa = [].concat(inputs.transcripts)[0]\n    var indexName = \"\"\n    if (fa.path.toLowerCase().endsWith('gz')) {\n        var str = fa.path.split('/').pop().split('.').slice(0,-2).join('.')\n    } else {\n        var str = fa.path.split('/').pop().split('.').slice(0,-1).join('.')\n    }\n  \n    var ext = fa.path.split('/').pop().split('.').pop()\n    if (ext.toLowerCase()=='fa' || ext.toLowerCase()=='fasta' || ext.toLowerCase()=='gz') {\n        indexName=str + \"_salmon_index\"\n    } else if (ext.toLowerCase()=='tar') {\n        indexName=inputs.transcripts.metadata.index_name\n    }\n\n    \n    return setMetadata(self, {'index_name': indexName})\n}",
+              "glob": "*tar"
+            },
+            "format": "TAR"
+          }
+        ],
+        "y": 233.3265766344572,
+        "sbg:links": [
+          {
+            "label": "Salmon Homepage",
+            "id": "http://combine-lab.github.io/salmon/"
+          },
+          {
+            "label": "Salmon Source Code",
+            "id": "https://github.com/COMBINE-lab/salmon"
+          },
+          {
+            "label": "Salmon Download",
+            "id": "https://github.com/COMBINE-lab/salmon/releases/tag/v0.9.1"
+          },
+          {
+            "label": "Salmon Publications",
+            "id": "http://biorxiv.org/content/early/2015/10/03/021592"
+          },
+          {
+            "label": "Salmon Documentation",
+            "id": "http://salmon.readthedocs.org/en/latest/"
+          }
+        ],
+        "sbg:image_url": null,
+        "sbg:project": "uros_sipetic/salmon-0-9-1-demo",
+        "sbg:publisher": "sbg",
+        "sbg:license": "GNU General Public License v3.0 only",
+        "sbg:revisionNotes": "Rename 'type' id to 'index_type'",
+        "sbg:validationErrors": [],
+        "sbg:toolkit": "Salmon"
+      },
+      "label": "Salmon Index",
+      "id": "Salmon_Index"
+    },
+    {
+      "sbg:x": 611.9122924804688,
+      "out": [
+        {
+          "id": "eq_classes"
+        },
+        {
+          "id": "mapping_info"
+        },
+        {
+          "id": "bootstrap_data"
+        },
+        {
+          "id": "unmapped_reads"
+        },
+        {
+          "id": "quant_genes_sf"
+        },
+        {
+          "id": "salmon_quant_archive"
+        },
+        {
+          "id": "quant_sf"
+        }
+      ],
+      "in": [
+        {
+          "source": "no_effective_length_correction",
+          "id": "no_effective_length_correction"
+        },
+        {
+          "source": "quasi_coverage",
+          "id": "quasi_coverage"
+        },
+        {
+          "source": "fld_mean",
+          "id": "fld_mean"
+        },
+        {
+          "source": "dump_eq_weights",
+          "id": "dump_eq_weights"
+        },
+        {
+          "source": "vb_prior",
+          "id": "vb_prior"
+        },
+        {
+          "source": "num_gibbs_samples",
+          "id": "num_gibbs_samples"
+        },
+        {
+          "source": "consistent_hits",
+          "id": "consistent_hits"
+        },
+        {
+          "source": "bias_speed_samp",
+          "id": "bias_speed_samp"
+        },
+        {
+          "source": "discard_orphans_quasi",
+          "id": "discard_orphans_quasi"
+        },
+        {
+          "source": "num_pre_aux_model_samples",
+          "id": "num_pre_aux_model_samples"
+        },
+        {
+          "source": "gtf",
+          "id": "gene_map"
+        },
+        {
+          "source": "write_mappings",
+          "id": "write_mappings"
+        },
+        {
+          "source": "num_bootstraps",
+          "id": "num_bootstraps"
+        },
+        {
+          "source": "meta",
+          "id": "meta"
+        },
+        {
+          "source": "max_read_occ",
+          "id": "max_read_occ"
+        },
+        {
+          "source": "min_assigned_frags",
+          "id": "min_assigned_frags"
+        },
+        {
+          "source": "fld_max",
+          "id": "fld_max"
+        },
+        {
+          "source": "Salmon_Index/salmon_index_archive",
+          "id": "salmon_index_archive"
+        },
+        {
+          "source": "range_factorization_bins",
+          "id": "range_factorization_bins"
+        },
+        {
+          "source": "faster_mapping",
+          "id": "faster_mapping"
+        },
+        {
+          "source": "per_transcript_prior",
+          "id": "per_transcript_prior"
+        },
+        {
+          "source": "write_unmapped_names",
+          "id": "write_unmapped_names"
+        },
+        {
+          "source": "dump_eq",
+          "id": "dump_eq"
+        },
+        {
+          "source": [
+            "SBG_Pair_FASTQs_by_Metadata_1/tuple_list"
+          ],
+          "id": "read_files"
+        },
+        {
+          "source": "init_uniform",
+          "id": "init_uniform"
+        },
+        {
+          "source": "no_bias_length_threshold",
+          "id": "no_bias_length_threshold"
+        },
+        {
+          "source": "incompatible_prior",
+          "id": "incompatible_prior"
+        },
+        {
+          "source": "allow_orphans_fmd",
+          "id": "allow_orphans_fmd"
+        },
+        {
+          "source": "max_occ",
+          "id": "max_occ"
+        },
+        {
+          "source": "use_vbopt",
+          "id": "use_vbopt"
+        },
+        {
+          "source": "gc_bias",
+          "id": "gc_bias"
+        },
+        {
+          "source": "pos_bias",
+          "id": "pos_bias"
+        },
+        {
+          "source": "num_aux_model_samples",
+          "id": "num_aux_model_samples"
+        },
+        {
+          "source": "no_fragment_length_distribution",
+          "id": "no_fragment_length_distribution"
+        },
+        {
+          "source": "num_bias_samples",
+          "id": "num_bias_samples"
+        },
+        {
+          "source": "reduce_GC_memory",
+          "id": "reduce_GC_memory"
+        },
+        {
+          "source": "thinning_factor",
+          "id": "thinning_factor"
+        },
+        {
+          "source": "gc_size_samp",
+          "id": "gc_size_samp"
+        },
+        {
+          "source": "strict_intersect",
+          "id": "strict_intersect"
+        },
+        {
+          "source": "fld_sd",
+          "id": "fld_sd"
+        },
+        {
+          "source": "forgetting_factor",
+          "id": "forgetting_factor"
+        },
+        {
+          "source": "alternative_init_mode",
+          "id": "alternative_init_mode"
+        },
+        {
+          "source": "seq_bias",
+          "id": "seq_bias"
+        },
+        {
+          "source": "no_length_correction",
+          "id": "no_length_correction"
+        },
+        {
+          "source": "SBG_Pair_FASTQs_by_Metadata_1/number_of_elements",
+          "id": "threads"
+        }
+      ],
+      "sbg:y": 356.1403503417969,
+      "run": {
+        "requirements": [
+          {
+            "class": "ShellCommandRequirement"
+          },
+          {
+            "ramMin": 7500,
+            "class": "ResourceRequirement",
+            "coresMin": "${\n    return inputs.threads ? inputs.threads : 8\n}"
+          },
+          {
+            "class": "DockerRequirement",
+            "dockerImageId": "ea69041ddb8d42ee13362fe71f1149e5044edbd7cbf66ef4a1919f8736777007",
+            "dockerPull": "images.sbgenomics.com/uros_sipetic/salmon:0.9.1"
+          },
+          {
+            "class": "InitialWorkDirRequirement",
+            "listing": [
+              "$(inputs.salmon_index_archive)"
+            ]
+          },
+          {
+            "class": "InlineJavascriptRequirement",
+            "expressionLib": [
+              "var updateMetadata = function(file, key, value) {\n    file['metadata'][key] = value;\n    return file;\n};\n\n\nvar setMetadata = function(file, metadata) {\n    if (!('metadata' in file))\n        file['metadata'] = metadata;\n    else {\n        for (var key in metadata) {\n            file['metadata'][key] = metadata[key];\n        }\n    }\n    return file\n};\n\nvar inheritMetadata = function(o1, o2) {\n    var commonMetadata = {};\n    if (!Array.isArray(o2)) {\n        o2 = [o2]\n    }\n    for (var i = 0; i < o2.length; i++) {\n        var example = o2[i]['metadata'];\n        for (var key in example) {\n            if (i == 0)\n                commonMetadata[key] = example[key];\n            else {\n                if (!(commonMetadata[key] == example[key])) {\n                    delete commonMetadata[key]\n                }\n            }\n        }\n    }\n    if (!Array.isArray(o1)) {\n        o1 = setMetadata(o1, commonMetadata)\n    } else {\n        for (var i = 0; i < o1.length; i++) {\n            o1[i] = setMetadata(o1[i], commonMetadata)\n        }\n    }\n    return o1;\n};\n\nvar toArray = function(file) {\n    return [].concat(file);\n};\n\nvar groupBy = function(files, key) {\n    var groupedFiles = [];\n    var tempDict = {};\n    for (var i = 0; i < files.length; i++) {\n        var value = files[i]['metadata'][key];\n        if (value in tempDict)\n            tempDict[value].push(files[i]);\n        else tempDict[value] = [files[i]];\n    }\n    for (var key in tempDict) {\n        groupedFiles.push(tempDict[key]);\n    }\n    return groupedFiles;\n};\n\nvar orderBy = function(files, key, order) {\n    var compareFunction = function(a, b) {\n        if (a['metadata'][key].constructor === Number) {\n            return a['metadata'][key] - b['metadata'][key];\n        } else {\n            var nameA = a['metadata'][key].toUpperCase();\n            var nameB = b['metadata'][key].toUpperCase();\n            if (nameA < nameB) {\n                return -1;\n            }\n            if (nameA > nameB) {\n                return 1;\n            }\n            return 0;\n        }\n    };\n\n    files = files.sort(compareFunction);\n    if (order == undefined || order == \"asc\")\n        return files;\n    else\n        return files.reverse();\n};"
+            ]
+          }
+        ],
+        "class": "CommandLineTool",
+        "baseCommand": [
+          "tar"
+        ],
+        "sbg:sbgMaintained": false,
+        "cwlVersion": "v1.0",
+        "sbg:latestRevision": 11,
+        "label": "Salmon Quant - Reads",
+        "doc": "**Salmon Quant - Reads** infers transcript abundance estimates from **RNA-seq data**, using a process called **quasi-mapping**. \n\n**Quasi-mapping** is a process of assigning reads to transcripts, without doing the exact base-to-base alignment. Seeing that for estimating transcript abundances, the main information needed is which transcript a read originates from and not the actual mapping coordinates, the idea with the **Salmon** tool was to implement a procedure that does exactly that [1, 2]. \n\nThe result is a software running at speeds orders of magnitude faster than other tools which utilize the full likehood model, while keeping near-optimal probabilistic RNA-seq quantification results [1, 2]. \n\nThe latest version of Salmon (0.9.x) introduces some novel concepts, like **Rich Factorization Classes**, which further increase the precision of the results, at a very negligible increase in runtime. This version of Salmon also supports quantification from already aligned BAM files, utilizing the full likelihood model (the same one as in RSEM), where the results are the same as RSEM, but the execution time is much shorter than in RSEM, this time due to engineering only [3].\n\n*A list of **all inputs and parameters** with corresponding descriptions can be found at the bottom of the page.*\n\n### Common Use Cases\n\n- The main input to the tool are **FASTQ read files** (single end or paired end). \n- A **Salmon index archive** (`-i`) also needs to be provided, in addition to an optional **Gene map** (`--geneMap`) file (which should be of the same annotations that were used in generating the **Transcriptome FASTA file**) if gene-level abundance results are desired. \n- The tool will generate transcript abundance estimates in plaintext format, and an optional file containing gene abundance estimates, if the input **Gene map** (`--gene-map`) file is provided. \n- In addition to the default output (**Quantification file**), additional outputs can be produced if the proper options are turned on for them (e.g. **Equivalent class counts** by setting `--dumpEq`, **Unmapped reads** by setting `--writeUnmappedNames`, **Bootstrap data** by setting `--numBootstraps` or `--numGibbsSamples`, **Mapping info** by setting `--write-mappings`...).\n- The **GC bias correction** option (`--gcBias`) will correct for GC bias and improve quantification accuracy, but at the cost of increased runtime (a rough estimate would be a **double** increase in runtime per sample).  \n- The use of *data-driven likelihood factorization* is achieved with the **Range factorization bins** parameter (`--rangeFactorizationBins`) and can be used to bring an increase in accuracy at a very small increase in runtime [3]. \n\n### Changes Introduced by Seven Bridges\n\n- All output files will be prefixed by the input sample ID (inferred from **Sample ID** metadata if existent, or from filename otherwise), instead of having identical names between runs. \n\n### Common Issues and Important Notes\n\n- For paired-end read files, it is important to properly set the **Paired End** metadata field on your read files.\n- For FASTQ reads in multi-file format (i.e. two FASTQ files for paired-end 1 and two FASTQ files for paired-end2), the proper metadata needs to be set (the following hierarchy is valid: **Sample ID/Library ID/Platform Unit ID/File Segment Number)**.\n- The GTF and FASTA files need to have compatible transcript IDs. \n\n### Performance Benchmarking\n\nThe main advantage of the Salmon software is that it is not computationally challenging, as alignment in the traditional sense is not performed. \nBelow is a table describing the runtimes and task costs for a couple of samples with different file sizes:\n\n| Experiment type |  Input size | Paired-end | # of reads | Read length | Duration |  Cost |  Instance (AWS) |\n|:---------------:|:-----------:|:----------:|:----------:|:-----------:|:--------:|:-----:|:----------:|\n|     RNA-Seq     |  2 x 4.5 GB |     Yes    |     20M     |     101     |   5min   | $0.05| c4.2xlarge |\n|     RNA-Seq     | 2 x 17.4 GB |     Yes    |     76M     |     101     |   15min  | $0.15 | c4.2xlarge |\n\n*Cost can be significantly reduced by using **spot instances**. Visit the [Knowledge Center](https://docs.sevenbridges.com/docs/about-spot-instances) for more details.*\n\n### References\n\n[1] [Salmon paper](biorxiv.org/content/biorxiv/early/2016/08/30/021592.full.pdf)   \n[2] [Rapmap paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4908361/)   \n[3] [Data-driven likelihood factorization](https://academic.oup.com/bioinformatics/article/33/14/i142/3953977)",
+        "id": "uros_sipetic/salmon-0-9-1-demo/salmon-quant-reads-0-9-1/11",
+        "sbg:toolAuthor": "Rob Patro, Carl Kingsford, Steve Mount, Mohsen Zakeri",
+        "inputs": [
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "No effective length correction",
+            "sbg:category": "Advanced options",
+            "doc": "Disables effective lenght correction when computing the probability that a fragment was generated from a transcript. If this flag is passed in, the fragment lenght distribution is not taken into account when computing this probability.",
+            "id": "no_effective_length_correction",
+            "inputBinding": {
+              "prefix": "--noEffectiveLengthCorrection",
+              "position": 24,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "float?",
+            "sbg:toolDefaultValue": "0",
+            "label": "Quasi coverage",
+            "sbg:category": "Advanced options",
+            "doc": "The fraction of the read that must be covered by MMPs (of length >= 31) if this read is to be considered as 'mapped'. This may help to avoid 'spurious' mappings. A value of 0 (the default) denotes no coverage threshold (a single 31-mer can yield a mapping). Since coverage by exact matching, large, MMPs is a rather strict condition, this value should likely be set to something low, if used. This value is expressed as a number between 0 and 1; a larger value is more stringent and less likely to allow spurios mappings, but can reduce sensitivity (EXPERIMENTAL).",
+            "id": "quasi_coverage",
+            "sbg:altPrefix": "--quasiCoverage",
+            "inputBinding": {
+              "prefix": "-x",
+              "position": 44,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "string?",
+            "sbg:toolDefaultValue": "A",
+            "label": "Library type",
+            "sbg:category": "Basic options",
+            "doc": "Format string describing the library type. As of version 0.7.0, Salmon also has the ability to automatically infer (i.e. guess) the library type based on how the first few thousand reads map to the transcriptome. To allow Salmon to automatically infer the library type, simply provide the letter 'A' as an input to this parameter (also the default behaviour). Otherwise, the input string should be in the format of maximum three uppercase letters ('SSS'). The first part of the library string (relative orientation) is only provided if the library is paired-end. The possible options are: I=inward, O=outword, M=matching. The second part of the read library string specifies whether the protocol is stranded or unstranded; the options are: S=stranded, U=unstranded. If the protocol is unstranded, then we\u2019re done. The final part of the library string specifies the strand from which the read originates in a strand-specific protocol \u2014 it is only provided if the library is stranded (i.e. if the library format string is of the form S). The possible values are: F=read 1 (or single-end read) comes from the forward strand, R=read 1 (or single-end read) comes from the reverse strand. Examples: IU, SF, OSR.",
+            "id": "lib_type",
+            "inputBinding": {
+              "prefix": "-l",
+              "position": 6,
+              "shellQuote": false
+            },
+            "default": "A"
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "200",
+            "label": "Mean fragment length",
+            "sbg:category": "Advanced options",
+            "doc": "The mean used in the fragment lenght distribution prior.",
+            "id": "fld_mean",
+            "inputBinding": {
+              "prefix": "--fldMean",
+              "position": 19,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Dump equivalence class weights",
+            "sbg:category": "Advanced options",
+            "doc": "Includes 'rich' equivalence class weights in the output when equivalence class information is being dumpes to file.",
+            "id": "dump_eq_weights",
+            "sbg:altPrefix": "--dumpEqWeights",
+            "inputBinding": {
+              "prefix": "-d",
+              "position": 42,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "float?",
+            "sbg:toolDefaultValue": "0.001",
+            "label": "VBEM prior",
+            "sbg:category": "Advanced options",
+            "doc": "The prior that will be used VBEM algorithm. This is interpreted as a per-nucleotide prior, unlees the --perTranscriptPrior flag is also given, in which case this is used as a transcript-level prior.",
+            "id": "vb_prior",
+            "inputBinding": {
+              "prefix": "--vbPrior",
+              "position": 31,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "0",
+            "label": "Number of Gibbs samples",
+            "sbg:category": "Advanced options",
+            "doc": "The number of Gibbs sampling rounds to perform.",
+            "id": "num_gibbs_samples",
+            "inputBinding": {
+              "prefix": "--numGibbsSamples",
+              "position": 33,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Consistent hits",
+            "sbg:category": "Advanced options",
+            "doc": "Force hits gathered during quasi-mapping to be \"consistent\" (i.e. co-linear and approximately the right distance apart).",
+            "id": "consistent_hits",
+            "inputBinding": {
+              "prefix": "-c",
+              "position": 14,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "1",
+            "label": "Bias speed sample",
+            "sbg:category": "Advanced options",
+            "doc": "The value at which the fragment length PMF is down-sampled when evaluating sequence-specific and & GC fragment bias. Larger values speed up effective length correction, but may decrease the fidelity of bias modeling results.",
+            "id": "bias_speed_samp",
+            "inputBinding": {
+              "prefix": "--biasSpeedSamp",
+              "position": 17,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Discard orphans in Quasi-mapping mode",
+            "sbg:category": "Basic options",
+            "doc": "Quasi-mapping mode only: Discard orphans mapping in quasi-mapping mode. If this flag is passed then only paired mappings will be considered towards quantification estimates. The default behaviour is to consider orphan mappings if no valid paired mappings exist. This flag is independent of the option to write the oprhaned mappings to file (--writeOprhanLinks).",
+            "id": "discard_orphans_quasi",
+            "inputBinding": {
+              "prefix": "--discardOrphansQuasi",
+              "position": 9,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "1000000",
+            "label": "Number of pre auxiliary model samples",
+            "sbg:category": "Advanced options",
+            "doc": "The first this many samples will have their assignment likelihoods and contributions to the transcript abundances computed without applying any auxiliary models. The purpose of ignoring the auxiliary models for the first that many observations is to avoid applying these models before their parameters have been learned sufficiently well.",
+            "id": "num_pre_aux_model_samples",
+            "inputBinding": {
+              "prefix": "--numPreAuxModelSamples",
+              "position": 29,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "File?",
+            "label": "Gene map",
+            "format": "GTF,GFF,GFF3",
+            "doc": "File containing a mapping of transcripts to genes.  If this file is provided Salmon will output both quant.sf and quant.genes.sf files, where the latter contains aggregated gene-level abundance estimates.  The transcript to gene mapping should be provided as either a GTF file, or a in a simple tab-delimited format where each line contains the name of a transcript and the gene to which it belongs separated by a tab.  The extension of the file is used to determine how the file should be parsed.  Files ending in '.gtf\u2019, \u2018.gff\u2019 or '.gff3\u2019 are assumed to be in GTF format; files with any other extension are assumed to be in the simple format. In GTF/GFF format, the \u2018transcript_id\u2019 is assumed to contain the transcript identifier and the \u2018gene_id\u2019 is assumed to contain the corresponding gene identifier.",
+            "id": "gene_map",
+            "sbg:category": "Inputs",
+            "inputBinding": {
+              "prefix": "-g",
+              "position": 13,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Write mappings",
+            "sbg:category": "Basic options",
+            "doc": "If this options is provided, then the quasi-mapping results/information will be written out in SAM-compatible format.",
+            "id": "write_mappings",
+            "inputBinding": {
+              "position": 39,
+              "separate": false,
+              "shellQuote": false,
+              "valueFrom": "${\n    if (inputs.write_mappings) {\n        function sharedStart(array) {\n            var A = array.concat().sort(),\n                a1 = A[0],\n                a2 = A[A.length - 1],\n                L = a1.length,\n                i = 0;\n            while (i < L && a1.charAt(i) === a2.charAt(i)) i++;\n            return a1.substring(0, i);\n        }\n\n        if (inputs.read_files) {\n            arr = [].concat(inputs.read_files)\n            path_list = []\n            arr.forEach(function(f) {\n                return path_list.push(f.path.replace(/\\\\/g, '/').replace(/.*\\//, ''))\n            })\n            common_prefix = sharedStart(path_list)\n            var x = common_prefix.replace(/\\-$|\\_$|\\.$/, '')\n            return \"--writeMappings=\" + x + \"_salmon_quant/\" + x + \".salmon_quant_mapping_info.sam\"\n        }\n    }\n}"
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "0",
+            "label": "Number of bootstraps",
+            "sbg:category": "Advanced options",
+            "doc": "The number of bootstrap samples to generate. Note: this is mutually exclusive with Gibbs sampling.",
+            "id": "num_bootstraps",
+            "inputBinding": {
+              "prefix": "--numBootstraps",
+              "position": 34,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Meta",
+            "sbg:category": "Basic options",
+            "doc": "If you're using Salmon on a metagenomic dataset, consider setting this flag to disable parts of the abundance estimation model that make less sense for metagenomic data.",
+            "id": "meta",
+            "inputBinding": {
+              "prefix": "--meta",
+              "position": 41,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "100",
+            "label": "Maximum read occurence",
+            "sbg:category": "Advanced options",
+            "doc": "Reads \"mapping\" to more than this many places won't be considered.",
+            "id": "max_read_occ",
+            "inputBinding": {
+              "prefix": "-w",
+              "position": 23,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "10",
+            "label": "Minimum assigned fragments",
+            "sbg:category": "Advanced options",
+            "doc": "The minimum number of fragments that must be assigned to the transcriptome.",
+            "id": "min_assigned_frags",
+            "inputBinding": {
+              "prefix": "--minAssignedFrags",
+              "position": 46,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "1000",
+            "label": "Maximum fragment length",
+            "sbg:category": "Advanced options",
+            "doc": "The maximum fragment length to consider when building the empirical distribution.",
+            "id": "fld_max",
+            "inputBinding": {
+              "prefix": "--fldMax",
+              "position": 18,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "File",
+            "label": "Salmon index archive",
+            "doc": "Archive outputed by Salmon Index tool.",
+            "id": "salmon_index_archive",
+            "format": "TAR",
+            "sbg:category": "Inputs"
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "0",
+            "label": "Range factorization bins",
+            "sbg:category": "Advanced options",
+            "doc": "Factorizes the likelihood used in quantification by addopting a new notion of equivalence classes based on the coniditonal probabilities with which fragments are generated from different transcripts. This is a more fine-grained factorization than the normal rich equivalence classes. The default value (0) corresponds to the standard rich equivalence classes and larger values imply a more fine-grained factorization. If range factorization is enabled, a common value to select for this parameter is 4.",
+            "id": "range_factorization_bins",
+            "inputBinding": {
+              "prefix": "--rangeFactorizationBins",
+              "position": 49,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Faster mapping",
+            "sbg:category": "Advanced options",
+            "doc": "[Developer]: Disables some extra checks during quasi-mapping. This may make mapping a little bit faster at the potential cost of returning too many mappings (i.e. some suboptimal mappings) for certain reads.",
+            "id": "faster_mapping",
+            "inputBinding": {
+              "prefix": "--fasterMapping",
+              "position": 48,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Per transcript prior",
+            "sbg:category": "Advanced options",
+            "doc": "The prior (either the default, or the argument provided via --vbPrior) will be interpreted as a transcript-level prior (i.e. each transcript will be given a prior read count of this value).",
+            "id": "per_transcript_prior",
+            "inputBinding": {
+              "prefix": "--perTranscriptPrior",
+              "position": 30,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Write unmapped names",
+            "sbg:category": "Advanced options",
+            "doc": "Write the names of unmapped reads to the file unmapped.txt in the auxiliary directory.",
+            "id": "write_unmapped_names",
+            "inputBinding": {
+              "prefix": "--writeUnmappedNames",
+              "position": 35,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Dump equivalence class counts",
+            "sbg:category": "Advanced options",
+            "doc": "Dump the equivalence class counts that were computed during quasi-mapping.",
+            "id": "dump_eq",
+            "inputBinding": {
+              "prefix": "--dumpEq",
+              "position": 15,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "File[]",
+            "label": "FASTQ Read files",
+            "format": "FASTQ",
+            "doc": "Input FASTQ read files.",
+            "id": "read_files",
+            "sbg:category": "Inputs",
+            "inputBinding": {
+              "shellQuote": false,
+              "position": 7,
+              "itemSeparator": " ",
+              "valueFrom": "${\n    function get_meta_map(m, file, meta) {\n        if (meta in file.metadata) {\n            return m[file.metadata[meta]]\n        } else {\n            return m['Undefined']\n        }\n    }\n\n    function create_new_map(map, file, meta) {\n        if (meta in file.metadata) {\n            map[file.metadata[meta]] = {}\n            return map[file.metadata[meta]]\n        } else {\n            map['Undefined'] = {}\n            return map['Undefined']\n        }\n    }\n\n    arr = [].concat(inputs.read_files)\n    map = {}\n\n    if (arr.length == 1) {\n        return \"-r \" + arr[0].path\n    }\n\n    for (i in arr) {\n\n        sm_map = get_meta_map(map, arr[i], 'sample_id')\n        if (!sm_map) sm_map = create_new_map(map, arr[i], 'sample_id')\n\n        lb_map = get_meta_map(sm_map, arr[i], 'library_id')\n        if (!lb_map) lb_map = create_new_map(sm_map, arr[i], 'library_id')\n\n        pu_map = get_meta_map(lb_map, arr[i], 'platform_unit_id')\n        if (!pu_map) pu_map = create_new_map(lb_map, arr[i], 'platform_unit_id')\n\n        if ('file_segment_number' in arr[i].metadata) {\n            if (pu_map[arr[i].metadata['file_segment_number']]) {\n                a = pu_map[arr[i].metadata['file_segment_number']]\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map[arr[i].metadata['file_segment_number']] = ar\n            } else pu_map[arr[i].metadata['file_segment_number']] = [].concat(arr[i])\n        } else {\n            if (pu_map['Undefined']) {\n                a = pu_map['Undefined']\n                ar = [].concat(a)\n                ar = ar.concat(arr[i])\n                pu_map['Undefined'] = ar\n            } else {\n                pu_map['Undefined'] = [].concat(arr[i])\n            }\n        }\n    }\n    tuple_list = []\n    for (sm in map)\n        for (lb in map[sm])\n            for (pu in map[sm][lb]) {\n                list = []\n                for (fsm in map[sm][lb][pu]) {\n                    list = map[sm][lb][pu][fsm]\n                    tuple_list.push(list)\n                }\n            }\n    //return tuple_list[0][0].path\n\n    pe_1 = []\n    pe_2 = []\n    se = []\n    if (tuple_list[0].length == 1) {\n        for (i = 0; i < tuple_list.length; i++) {\n            se = se.concat(tuple_list[i][0].path)\n        }\n    }\n    for (i = 0; i < tuple_list.length; i++) {\n        for (j = 0; j < tuple_list[i].length; j++) {\n            if (tuple_list[i][j].metadata.paired_end == 1) {\n                pe_1 = pe_1.concat(tuple_list[i][j].path)\n            } else if (tuple_list[i][j].metadata.paired_end == 2) {\n                pe_2 = pe_2.concat(tuple_list[i][j].path)\n            }\n        }\n    }\n\n\n    if (pe_2.length == 0) {\n        cmd = \"\"\n        if (se.length > 0) {\n            tmp = se\n        } else if (pe_1.length > 0) {\n            tmp = pe_1\n        }\n        for (i = 0; i < tmp.length; i++) {\n            cmd += tmp[i] + \" \"\n        }\n        return \"-r \" + cmd\n    } else if (pe_2.length > 0) {\n        cmd1 = \"\"\n        cmd2 = \"\"\n        for (i = 0; i < pe_1.length; i++) {\n            cmd1 += pe_1[i] + \" \"\n            cmd2 += pe_2[i] + \" \"\n        }\n        return \"-1 \" + cmd1 + \" -2 \" + cmd2\n    } else {\n        return \"\"\n    }\n\n}"
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Initialize uniform parameters",
+            "sbg:category": "Advanced options",
+            "doc": "Initialize the offline inference with uniform parameters, rather than seeding with online parameters.",
+            "id": "init_uniform",
+            "inputBinding": {
+              "prefix": "--initUniform",
+              "position": 22,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "No bias length threshold",
+            "sbg:category": "Advanced options",
+            "doc": "[Experimental] If this option is enabled, then no (lower) threshold will be set on how short bias correction can make effective lengths. This can increase precision of bias correction, but harm robustness. The default correction applies a threshold.",
+            "id": "no_bias_length_threshold",
+            "inputBinding": {
+              "prefix": "--noBiasLengthThreshold",
+              "position": 26,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "float?",
+            "sbg:toolDefaultValue": "9.9999999999999995e-21",
+            "label": "Incompatible prior probability",
+            "sbg:category": "Basic options",
+            "doc": "This option sets the prior probability that an alignment that disagrees with the specified library type (--libType) results from the true fragment origin. Setting this to 0 specifies that alignments that disagree with the library type should be \"impossible\", while setting it to 1 says that alignments that disagree with the library type are no less likely than those that do.",
+            "id": "incompatible_prior",
+            "inputBinding": {
+              "prefix": "--incompatPrior",
+              "position": 12,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Allow orphans in FMD mode",
+            "sbg:category": "Basic options",
+            "doc": "FMD-mapping mode only: Consider orphaned reads as valid hits when performing lightweight-alignment. This option will increase sensitivity (allow more reads to map and more transcripts to be detected), but may decrease specificity as orphaned alignments are more likely to be spurious.",
+            "id": "allow_orphans_fmd",
+            "inputBinding": {
+              "prefix": "--allowOrphansFMD",
+              "position": 9,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "200",
+            "label": "Maximum (S)MEM occurance",
+            "sbg:category": "Advanced options",
+            "doc": "(S)MEMs occuring more than this many times won't be considered.",
+            "id": "max_occ",
+            "inputBinding": {
+              "prefix": "-m",
+              "position": 22,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Use Variational Bayesian optimization",
+            "sbg:category": "Advanced options",
+            "doc": "Use the Variational Bayesian EM rather than the traditional EM algorithm for optimization in the batch passes.",
+            "id": "use_vbopt",
+            "inputBinding": {
+              "prefix": "--useVBOpt",
+              "position": 32,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "GC bias correction",
+            "sbg:category": "Basic options",
+            "doc": "[Biasl] Perform fragment GC bias correction.",
+            "id": "gc_bias",
+            "inputBinding": {
+              "prefix": "--gcBias",
+              "position": 11,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Position bias",
+            "sbg:category": "Basic options",
+            "doc": "Enable modeling of a position-specific fragment start distribution. This is meant to model non-uniform coverage biases that are sometimes present in RNA-seq data (e.g. 5' or 3' positional bias). Currently, a small and fixed number of models are learned for different length classes of transcripts.",
+            "id": "pos_bias",
+            "inputBinding": {
+              "prefix": "--posBias",
+              "position": 50,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "5000000",
+            "label": "Number of auxiliary model samples",
+            "sbg:category": "Advanced options",
+            "doc": "The first this many numbers are used to train the auxiliary model parameters (e.g. fragment length distribution, bias, etc.). After their first that many observations, the auxiliary model parameters will be assumed to have converged and will be fixed.",
+            "id": "num_aux_model_samples",
+            "inputBinding": {
+              "prefix": "--numAuxModelSamples",
+              "position": 28,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "No fragment length distribution",
+            "sbg:category": "Advanced options",
+            "doc": "[Experimental] Do not consider concordance with the learned fragment lenght distribution when trying to determine the probability that a fragment has originated from a specific location. Normally, fragments with unlikely lengths will be assigned a smaller relative probability than those with more likely lenghts. When this flag is passed in, the observed fragment length has no effect on that fragment's a priori probability.",
+            "id": "no_fragment_length_distribution",
+            "inputBinding": {
+              "prefix": "--noFragLengthDist",
+              "position": 25,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "2000000",
+            "label": "Number of bias samples",
+            "sbg:category": "Advanced options",
+            "doc": "Number of fragment mappings to use when learning the sequence-specific bias model.",
+            "id": "num_bias_samples",
+            "inputBinding": {
+              "prefix": "--numBiasSamples",
+              "position": 27,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Reduce GC memory",
+            "sbg:category": "Advanced options",
+            "doc": "If this option is selected, a more memory efficient (but slightly slower) representation is used to compute fragment GC content. Enabling this will reduce memory usage, but can also reduce speed. However, the results themselves will remain the same.",
+            "id": "reduce_GC_memory",
+            "inputBinding": {
+              "prefix": "--reduceGCMemory",
+              "position": 47,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "16",
+            "label": "Thinning factor",
+            "sbg:category": "Advanced options",
+            "doc": "Number of steps to discard for every sample kept from the Gibbs chain. The larger this number, the less chance that subsequent samples are auto-correlated, but the slower sampling becomes.",
+            "id": "thinning_factor",
+            "inputBinding": {
+              "prefix": "--thinningFactor",
+              "position": 40,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "1",
+            "label": "GC size sample",
+            "sbg:category": "Advanced options",
+            "doc": "The value by which to downsample transcripts when representing the GC content. Larger values will reduce memory usage, but may decrease the fidelity of bias modeling results.",
+            "id": "gc_size_samp",
+            "inputBinding": {
+              "prefix": "--gcSizeSamp",
+              "position": 16,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Strict intersect",
+            "sbg:category": "Advanced options",
+            "doc": "Modifies how orphans are assigned. When this flag is set, if the intersection of the quasi-mapping for the left and right is empty, then all mappings for the left and all mappings for the right read are reported as orphan quasi-mappings.",
+            "id": "strict_intersect",
+            "inputBinding": {
+              "prefix": "--strictIntersect",
+              "position": 17,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "int?",
+            "sbg:toolDefaultValue": "80",
+            "label": "Fragment length standard deviation",
+            "sbg:category": "Advanced options",
+            "doc": "The standard deviation used in the fragment length distribution prior.",
+            "id": "fld_sd",
+            "inputBinding": {
+              "prefix": "--fldSD",
+              "position": 20,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "float?",
+            "sbg:toolDefaultValue": "0.65000000000000002",
+            "label": "Forgetting factor",
+            "sbg:category": "Advanced options",
+            "doc": "The forgetting factor used in the online learning schedule. A smaller value results in quicker learning, but higher variance and may be unstable. A larger value results in slower learning but may be more stable. The input value should be in the interva (0.5, 1.0].",
+            "id": "forgetting_factor",
+            "inputBinding": {
+              "prefix": "-f",
+              "position": 21,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "Alternative initialization mode",
+            "sbg:category": "Advanced options",
+            "doc": "Use an alternative strategy (rather than simple interpolation) between the online and uniform abundance estimates to initialize the EM/VBEM algorithm.",
+            "id": "alternative_init_mode",
+            "inputBinding": {
+              "prefix": "--alternativeInitMode",
+              "position": 45,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "off",
+            "label": "Sequence-specific bias correction",
+            "sbg:category": "Basic options",
+            "doc": "Perform sequence-specific bias correction.",
+            "id": "seq_bias",
+            "inputBinding": {
+              "prefix": "--seqBias",
+              "position": 10,
+              "shellQuote": false
+            }
+          },
+          {
+            "type": "boolean?",
+            "sbg:toolDefaultValue": "Off",
+            "label": "No length correction",
+            "sbg:category": "Advanced options",
+            "doc": "Entirely disables length correction when estimating abundance of transcripts. This option can be used with protocols where one expects that fragments derive from their underlying targets without regard to that target's length, e.g. QuantSeq (EXPERIMENTAL).",
+            "id": "no_length_correction",
+            "inputBinding": {
+              "prefix": "--noLengthCorrection",
+              "position": 43,
+              "shellQuote": false
+            }
+          },
+          {
+            "doc": "Number of threads to be used.",
+            "type": "int?",
+            "sbg:toolDefaultValue": "8",
+            "label": "Number of threads",
+            "sbg:category": "Basic options",
+            "sbg:includeInPorts": true,
+            "id": "threads",
+            "inputBinding": {
+              "prefix": "-p",
+              "position": 37,
+              "shellQuote": false
+            },
+            "default": 8
+          }
+        ],
+        "sbg:toolkitVersion": "0.9.1",
+        "sbg:appVersion": [
+          "v1.0"
+        ],
+        "arguments": [
+          {
+            "position": 1,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "-xf"
+          },
+          {
+            "position": 2,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "${\n    var str = [].concat(inputs.salmon_index_archive)[0].path.split(\"/\").pop();\n    return str\n\n}"
+          },
+          {
+            "position": 3,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "&&"
+          },
+          {
+            "position": 4,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "salmon"
+          },
+          {
+            "position": 5,
+            "separate": false,
+            "shellQuote": false,
+            "valueFrom": "quant"
+          },
+          {
+            "prefix": "-i",
+            "position": 5,
+            "shellQuote": false,
+            "valueFrom": "${\n    return inputs.salmon_index_archive.metadata.index_name\n}"
+          },
+          {
+            "position": 99,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return \"&& tar -cf \" + x + \"_archive.tar \" + x\n    }\n}"
+          },
+          {
+            "position": 103,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        y = x + \"/quant.sf\"\n        z = x + \"/\" + x + \".sf\"\n        return \"&& mv \" + y + \" \" + z\n    }\n}"
+          },
+          {
+            "prefix": "-o",
+            "position": 36,
+            "shellQuote": false,
+            "valueFrom": "${\n    var arr = [].concat(inputs.read_files)\n    if (arr[0].metadata && arr[0].metadata.sample_id) {\n        var basename = arr[0].metadata.sample_id\n    } else {\n        var basename = arr[0].path.split('/').pop().split('.')[0]\n    }\n    return basename + \".salmon_quant\"\n}"
+          },
+          {
+            "position": 102,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.gene_map) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        y = x + \"/quant.genes.sf\"\n        z = x + \"/\" + x + \".genes.sf\"\n        return \"&& mv \" + y + \" \" + z\n    }\n}"
+          },
+          {
+            "position": 101,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.dump_eq) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        y = x + \"/aux_info/eq_classes.txt\"\n        z = x + \"/aux_info/\" + x + \".eq_classes.txt\"\n        return \"&& mv \" + y + \" \" + z\n    }\n}"
+          },
+          {
+            "position": 100,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.write_unmapped_names) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        y = x + \"/aux_info/unmapped_names.txt\"\n        z = x + \"/aux_info/\" + x + \".unmapped_names.txt\"\n        return \"&& mv \" + y + \" \" + z\n    }\n}"
+          },
+          {
+            "prefix": "--auxDir",
+            "position": 38,
+            "shellQuote": false,
+            "valueFrom": "aux_info"
+          },
+          {
+            "position": 105,
+            "shellQuote": false,
+            "valueFrom": "${\n    if (inputs.num_bootstraps || inputs.num_gibbs_samples) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return \"&& tar -cf \" + x + \"_bootstrap_folder.tar \" + x + '/aux_info/bootstrap'\n    }\n}"
+          }
+        ],
+        "sbg:categories": [
+          "RNA",
+          "Quantification"
+        ],
+        "$namespaces": {
+          "sbg": "https://sevenbridges.com"
+        },
+        "sbg:cmdPreview": "tar -xf salmon_index_archive.tar.gz && salmon quant -i salmon_index  -r /path/to/sampleA_lane1_pe1.fastq -o sampleA_lane1_pe1.salmon_quant --auxDir aux_info  && tar -cf sampleA_lane1_pe1.salmon_quant_archive.tar sampleA_lane1_pe1.salmon_quant  && mv sampleA_lane1_pe1.salmon_quant/aux_info/unmapped_names.txt sampleA_lane1_pe1.salmon_quant/aux_info/sampleA_lane1_pe1.salmon_quant.unmapped_names.txt  && mv sampleA_lane1_pe1.salmon_quant/aux_info/eq_classes.txt sampleA_lane1_pe1.salmon_quant/aux_info/sampleA_lane1_pe1.salmon_quant.eq_classes.txt  && mv sampleA_lane1_pe1.salmon_quant/quant.genes.sf sampleA_lane1_pe1.salmon_quant/sampleA_lane1_pe1.salmon_quant.genes.sf  && mv sampleA_lane1_pe1.salmon_quant/quant.sf sampleA_lane1_pe1.salmon_quant/sampleA_lane1_pe1.salmon_quant.sf  && tar -cf sampleA_lane1_pe1.salmon_quant_bootstrap_folder.tar sampleA_lane1_pe1.salmon_quant/aux_info/bootstrap",
+        "sbg:contributors": [
+          "uros_sipetic",
+          "anamijalkovic"
+        ],
+        "sbg:id": "admin/sbg-public-data/salmon-quant-reads-0-9-1/11",
+        "outputs": [
+          {
+            "type": "File?",
+            "label": "Equivalent class counts",
+            "doc": "A file that contains the equivalence classes and corresponding counts that were computed during quasi-mapping.",
+            "id": "eq_classes",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return x + \"/aux_info/\" + x + \".eq_classes.txt\"\n    }\n}"
+            },
+            "format": "TXT"
+          },
+          {
+            "type": "File?",
+            "label": "Mapping info",
+            "doc": "Information about the quasi-mappings Salmon Quant uses for quantification.",
+            "id": "mapping_info",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return x + \"_salmon_quant/\" + x + \".salmon_quant_mapping_info.sam\"\n    }\n}"
+            },
+            "format": "SAM"
+          },
+          {
+            "type": "File?",
+            "label": "Bootstrap data",
+            "doc": "A TAR bundle containing the bootstrap folder, if bootstrapping was performed.",
+            "id": "bootstrap_data",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "*salmon_quant_bootstrap_folder.tar"
+            },
+            "format": "TAR"
+          },
+          {
+            "type": "File?",
+            "label": "Unmapped reads",
+            "doc": "File with the names of reads (or mates in paired-end reads) that do not map to the transcriptome.",
+            "id": "unmapped_reads",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return x + \"/aux_info/\" + x + \".unmapped_names.txt\"\n    }\n}"
+            },
+            "format": "TXT"
+          },
+          {
+            "type": "File?",
+            "label": "Gene-level quantification file",
+            "doc": "File containing aggregated gene-level abundance estimates.",
+            "id": "quant_genes_sf",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return x + \"/\" + x + \".genes.sf\"\n    }\n}"
+            },
+            "format": "SF"
+          },
+          {
+            "type": "File?",
+            "label": "Salmon Quant archive",
+            "doc": "All files outputed by Salmon Quant tool. Contains quantification files.",
+            "id": "salmon_quant_archive",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "*salmon_quant_archive.tar"
+            },
+            "format": "TAR"
+          },
+          {
+            "type": "File?",
+            "label": "Quantification file",
+            "doc": "Salmon Quant output file, containing quantification results.",
+            "id": "quant_sf",
+            "outputBinding": {
+              "outputEval": "${\n    return inheritMetadata(self, inputs.read_files)\n\n}",
+              "glob": "${\n    if (inputs.read_files) {\n        var arr = [].concat(inputs.read_files)\n        if (arr[0].metadata && arr[0].metadata.sample_id) {\n            var basename = arr[0].metadata.sample_id\n        } else {\n            var basename = arr[0].path.split('/').pop().split('.')[0]\n        }\n        x = basename + \".salmon_quant\"\n        return x + \"/\" + x + \".sf\"\n    }\n}"
+            },
+            "format": "SF"
+          }
+        ],
+        "sbg:createdBy": "uros_sipetic",
+        "sbg:links": [
+          {
+            "label": "Salmon Homepage",
+            "id": "http://combine-lab.github.io/salmon/"
+          },
+          {
+            "label": "Salmon Source Code",
+            "id": "https://github.com/COMBINE-lab/salmon"
+          },
+          {
+            "label": "Salmon Download",
+            "id": "https://github.com/COMBINE-lab/salmon/releases/tag/v0.9.1"
+          },
+          {
+            "label": "Salmon Publications",
+            "id": "http://biorxiv.org/content/early/2015/10/03/021592"
+          },
+          {
+            "label": "Salmon Documentation",
+            "id": "http://salmon.readthedocs.org/en/latest/"
+          }
+        ],
+        "sbg:image_url": null,
+        "sbg:project": "uros_sipetic/salmon-0-9-1-demo",
+        "sbg:publisher": "sbg",
+        "sbg:license": "GNU General Public License v3.0 only",
+        "sbg:revisionNotes": "Output Salmon archive without renaming files inside (to comply with Sleuth).",
+        "sbg:validationErrors": [],
+        "sbg:toolkit": "Salmon"
+      },
+      "label": "Salmon Quant - Reads",
+      "id": "Salmon_Quant___Reads",
+      "scatter": [
+        "read_files"
+      ]
+    }
+  ],
+  "hints": [
+    {
+      "class": "sbg:AWSInstanceType",
+      "value": "c4.8xlarge;ebs-gp2;1024"
+    },
+    {
+      "class": "sbg:AlibabaCloudInstanceType",
+      "value": "ecs.c5.8xlarge;cloud_ssd;600"
+    }
+  ],
+  "cwlVersion": "v1.0",
+  "label": "Salmon Workflow CWL 1.0",
+  "sbg:canvas_x": -93,
+  "sbg:toolAuthor": "Rob Patro, Carl Kingsford, Steve Mount, Mohsen Zakeri",
+  "sbg:canvas_y": 66,
+  "inputs": [
+    {
+      "description": "Transcriptome FASTA file, or an already generated Salmon index archive.",
+      "sbg:x": -353,
+      "sbg:fileTypes": "FASTA, FA, TAR, FASTA.GZ, FA.GZ",
+      "sbg:y": 160.9386444091797,
+      "type": "File",
+      "label": "Transcriptome FASTA or Salmon index archive",
+      "doc": "Transcriptome FASTA file, or an already generated Salmon index archive.",
+      "id": "transcriptome_fasta_or_salmon_index_archive",
+      "sbg:suggestedValue": {
+        "name": "gencode.v27.transcripts.salmon-0.9.1-index-archive.tar",
+        "class": "File",
+        "path": "5a6ba7c84f0c278a3ba2d1e2"
+      },
+      "format": "FASTA,FA,TAR,FASTA.GZ,FA.GZ",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "Input FASTQ read files.",
+      "sbg:x": -347.4034423828125,
+      "sbg:fileTypes": "FASTQ, FQ, FASTQ.GZ, FQ.GZ",
+      "sbg:y": 371.9826965332031,
+      "type": "File[]",
+      "label": "FASTQ Read Files",
+      "doc": "Input FASTQ read files.",
+      "id": "reads",
+      "format": "FASTQ, FQ, FASTQ.GZ, FQ.GZ",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "File containing a mapping of transcripts to genes.  If this file is provided Salmon will output both quant.sf and quant.genes.sf files, where the latter contains aggregated gene-level abundance estimates.  The transcript to gene mapping should be provided as either a GTF file, or a in a simple tab-delimited format where each line contains the name of a transcript and the gene to which it belongs separated by a tab.  The extension of the file is used to determine how the file should be parsed.  Files ending in '.gtf\u2019, \u2018.gff\u2019 or '.gff3\u2019 are assumed to be in GTF format; files with any other extension are assumed to be in the simple format. In GTF/GFF format, the \u2018transcript_id\u2019 is assumed to contain the transcript identifier and the \u2018gene_id\u2019 is assumed to contain the corresponding gene identifier.",
+      "sbg:x": -349,
+      "sbg:fileTypes": "GTF, GFF, GFF3",
+      "sbg:y": 506.34210205078125,
+      "type": "File?",
+      "label": "Gene map or GTF file",
+      "doc": "File containing a mapping of transcripts to genes.  If this file is provided Salmon will output both quant.sf and quant.genes.sf files, where the latter contains aggregated gene-level abundance estimates.  The transcript to gene mapping should be provided as either a GTF file, or a in a simple tab-delimited format where each line contains the name of a transcript and the gene to which it belongs separated by a tab.  The extension of the file is used to determine how the file should be parsed.  Files ending in '.gtf\u2019, \u2018.gff\u2019 or '.gff3\u2019 are assumed to be in GTF format; files with any other extension are assumed to be in the simple format. In GTF/GFF format, the \u2018transcript_id\u2019 is assumed to contain the transcript identifier and the \u2018gene_id\u2019 is assumed to contain the corresponding gene identifier.",
+      "id": "gtf",
+      "sbg:suggestedValue": {
+        "name": "gencode.v27.annotation.gtf",
+        "class": "File",
+        "path": "5a6ba7f14f0c278a3ba2d1e3"
+      },
+      "format": "GTF,GFF,GFF3",
+      "sbg:includeInPorts": true
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Maximum number of parallel jobs to allow in the tool downstream of this one.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "4",
+      "label": "Maximum number of parallel jobs",
+      "id": "max_number_of_parallel_jobs",
+      "sbg:suggestedValue": 4,
+      "sbg:category": "Options"
+    },
+    {
+      "description": "The size of k-mers that should be used for the quasi index. K-mer length should be an odd number.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "31",
+      "label": "K-mer length",
+      "id": "kmer_length",
+      "sbg:category": "Options"
+    },
+    {
+      "description": "This flag will expect the input transcript FASTA to be in GENCODE format and will split the transcript name at the first '|' character. These reduced names will be used in the output and when looking for these transcripts in a gene to transcript GTF.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "GENCODE FASTA",
+      "id": "gencode",
+      "sbg:category": "Options"
+    },
+    {
+      "description": "This flag will disable the default indexing behavior of discarding sequence-identical duplicate transcripts. If this flag is passed, then duplicate transcripts that appear in the input will be retained and quantified separately.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Keep duplicates",
+      "id": "keep_duplicates",
+      "sbg:suggestedValue": true,
+      "sbg:category": "Options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Write the names of unmapped reads to the file unmapped.txt in the auxiliary directory.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Write unmapped names",
+      "id": "write_unmapped_names",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "If this options is provided, then the quasi-mapping results/information will be written out in SAM-compatible format.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Write mappings",
+      "id": "write_mappings",
+      "sbg:category": "Basic options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The prior that will be used VBEM algorithm. This is interpreted as a per-nucleotide prior, unlees the --perTranscriptPrior flag is also given, in which case this is used as a transcript-level prior.",
+      "type": "float?",
+      "sbg:toolDefaultValue": "0.001",
+      "label": "VBEM prior",
+      "id": "vb_prior",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Use the Variational Bayesian EM rather than the traditional EM algorithm for optimization in the batch passes.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Use Variational Bayesian optimization",
+      "id": "use_vbopt",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Number of steps to discard for every sample kept from the Gibbs chain. The larger this number, the less chance that subsequent samples are auto-correlated, but the slower sampling becomes.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "16",
+      "label": "Thinning factor",
+      "id": "thinning_factor",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "Modifies how orphans are assigned. When this flag is set, if the intersection of the quasi-mapping for the left and right is empty, then all mappings for the left and all mappings for the right read are reported as orphan quasi-mappings.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Strict intersect",
+      "id": "strict_intersect",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "Perform sequence-specific bias correction.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Sequence-specific bias correction",
+      "id": "seq_bias",
+      "sbg:category": "Basic options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "If this option is selected, a more memory efficient (but slightly slower) representation is used to compute fragment GC content. Enabling this will reduce memory usage, but can also reduce speed. However, the results themselves will remain the same.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Reduce GC memory",
+      "id": "reduce_GC_memory",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Factorizes the likelihood used in quantification by addopting a new notion of equivalence classes based on the coniditonal probabilities with which fragments are generated from different transcripts. This is a more fine-grained factorization than the normal rich equivalence classes. The default value (0) corresponds to the standard rich equivalence classes and larger values imply a more fine-grained factorization. If range factorization is enabled, a common value to select for this parameter is 4.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "0",
+      "label": "Range factorization bins",
+      "id": "range_factorization_bins",
+      "sbg:suggestedValue": 4,
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The fraction of the read that must be covered by MMPs (of length >= 31) if this read is to be considered as 'mapped'. This may help to avoid 'spurious' mappings. A value of 0 (the default) denotes no coverage threshold (a single 31-mer can yield a mapping). Since coverage by exact matching, large, MMPs is a rather strict condition, this value should likely be set to something low, if used. This value is expressed as a number between 0 and 1; a larger value is more stringent and less likely to allow spurios mappings, but can reduce sensitivity (EXPERIMENTAL).",
+      "type": "float?",
+      "sbg:toolDefaultValue": "0",
+      "label": "Quasi coverage",
+      "id": "quasi_coverage",
+      "sbg:category": "Advanced options",
+      "sbg:altPrefix": "--quasiCoverage"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Enable modeling of a position-specific fragment start distribution. This is meant to model non-uniform coverage biases that are sometimes present in RNA-seq data (e.g. 5' or 3' positional bias). Currently, a small and fixed number of models are learned for different length classes of transcripts.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Position bias",
+      "id": "pos_bias",
+      "sbg:category": "Basic options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The prior (either the default, or the argument provided via --vbPrior) will be interpreted as a transcript-level prior (i.e. each transcript will be given a prior read count of this value).",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Per transcript prior",
+      "id": "per_transcript_prior",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The first this many samples will have their assignment likelihoods and contributions to the transcript abundances computed without applying any auxiliary models. The purpose of ignoring the auxiliary models for the first that many observations is to avoid applying these models before their parameters have been learned sufficiently well.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "1000000",
+      "label": "Number of pre auxiliary model samples",
+      "id": "num_pre_aux_model_samples",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The number of Gibbs sampling rounds to perform.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "0",
+      "label": "Number of Gibbs samples",
+      "id": "num_gibbs_samples",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "The number of bootstrap samples to generate. Note: this is mutually exclusive with Gibbs sampling.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "0",
+      "label": "Number of bootstraps",
+      "id": "num_bootstraps",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "Number of fragment mappings to use when learning the sequence-specific bias model.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "2000000",
+      "label": "Number of bias samples",
+      "id": "num_bias_samples",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The first this many numbers are used to train the auxiliary model parameters (e.g. fragment length distribution, bias, etc.). After their first that many observations, the auxiliary model parameters will be assumed to have converged and will be fixed.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "5000000",
+      "label": "Number of auxiliary model samples",
+      "id": "num_aux_model_samples",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Entirely disables length correction when estimating abundance of transcripts. This option can be used with protocols where one expects that fragments derive from their underlying targets without regard to that target's length, e.g. QuantSeq (EXPERIMENTAL).",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "No length correction",
+      "id": "no_length_correction",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "[Experimental] Do not consider concordance with the learned fragment lenght distribution when trying to determine the probability that a fragment has originated from a specific location. Normally, fragments with unlikely lengths will be assigned a smaller relative probability than those with more likely lenghts. When this flag is passed in, the observed fragment length has no effect on that fragment's a priori probability.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "No fragment length distribution",
+      "id": "no_fragment_length_distribution",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Disables effective lenght correction when computing the probability that a fragment was generated from a transcript. If this flag is passed in, the fragment lenght distribution is not taken into account when computing this probability.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "No effective length correction",
+      "id": "no_effective_length_correction",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "[Experimental] If this option is enabled, then no (lower) threshold will be set on how short bias correction can make effective lengths. This can increase precision of bias correction, but harm robustness. The default correction applies a threshold.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "No bias length threshold",
+      "id": "no_bias_length_threshold",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The minimum number of fragments that must be assigned to the transcriptome.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "10",
+      "label": "Minimum assigned fragments",
+      "id": "min_assigned_frags",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "If you're using Salmon on a metagenomic dataset, consider setting this flag to disable parts of the abundance estimation model that make less sense for metagenomic data.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Meta",
+      "id": "meta",
+      "sbg:category": "Basic options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Reads \"mapping\" to more than this many places won't be considered.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "100",
+      "label": "Maximum read occurence",
+      "id": "max_read_occ",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "(S)MEMs occuring more than this many times won't be considered.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "200",
+      "label": "Maximum (S)MEM occurance",
+      "id": "max_occ",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Initialize the offline inference with uniform parameters, rather than seeding with online parameters.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Initialize uniform parameters",
+      "id": "init_uniform",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "This option sets the prior probability that an alignment that disagrees with the specified library type (--libType) results from the true fragment origin. Setting this to 0 specifies that alignments that disagree with the library type should be \"impossible\", while setting it to 1 says that alignments that disagree with the library type are no less likely than those that do.",
+      "type": "float?",
+      "sbg:toolDefaultValue": "9.9999999999999995e-21",
+      "label": "Incompatible prior probability",
+      "id": "incompatible_prior",
+      "sbg:category": "Basic options"
+    },
+    {
+      "description": "The value by which to downsample transcripts when representing the GC content. Larger values will reduce memory usage, but may decrease the fidelity of bias modeling results.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "1",
+      "label": "GC size sample",
+      "id": "gc_size_samp",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "[Biasl] Perform fragment GC bias correction.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "GC bias correction",
+      "id": "gc_bias",
+      "sbg:category": "Basic options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The forgetting factor used in the online learning schedule. A smaller value results in quicker learning, but higher variance and may be unstable. A larger value results in slower learning but may be more stable. The input value should be in the interva (0.5, 1.0].",
+      "type": "float?",
+      "sbg:toolDefaultValue": "0.65000000000000002",
+      "label": "Forgetting factor",
+      "id": "forgetting_factor",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "The standard deviation used in the fragment length distribution prior.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "80",
+      "label": "Fragment length standard deviation",
+      "id": "fld_sd",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The mean used in the fragment lenght distribution prior.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "200",
+      "label": "Mean fragment length",
+      "id": "fld_mean",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "The maximum fragment length to consider when building the empirical distribution.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "1000",
+      "label": "Maximum fragment length",
+      "id": "fld_max",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "[Developer]: Disables some extra checks during quasi-mapping. This may make mapping a little bit faster at the potential cost of returning too many mappings (i.e. some suboptimal mappings) for certain reads.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Faster mapping",
+      "id": "faster_mapping",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Includes 'rich' equivalence class weights in the output when equivalence class information is being dumpes to file.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Dump equivalence class weights",
+      "id": "dump_eq_weights",
+      "sbg:category": "Advanced options",
+      "sbg:altPrefix": "--dumpEqWeights"
+    },
+    {
+      "description": "Dump the equivalence class counts that were computed during quasi-mapping.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Dump equivalence class counts",
+      "id": "dump_eq",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "Quasi-mapping mode only: Discard orphans mapping in quasi-mapping mode. If this flag is passed then only paired mappings will be considered towards quantification estimates. The default behaviour is to consider orphan mappings if no valid paired mappings exist. This flag is independent of the option to write the oprhaned mappings to file (--writeOprhanLinks).",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Discard orphans in Quasi-mapping mode",
+      "id": "discard_orphans_quasi",
+      "sbg:category": "Basic Options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Force hits gathered during quasi-mapping to be \"consistent\" (i.e. co-linear and approximately the right distance apart).",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Consistent hits",
+      "id": "consistent_hits",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "The value at which the fragment length PMF is down-sampled when evaluating sequence-specific and & GC fragment bias. Larger values speed up effective length correction, but may decrease the fidelity of bias modeling results.",
+      "type": "int?",
+      "sbg:toolDefaultValue": "1",
+      "label": "Bias speed sample",
+      "id": "bias_speed_samp",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Use an alternative strategy (rather than simple interpolation) between the online and uniform abundance estimates to initialize the EM/VBEM algorithm.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "Off",
+      "label": "Alternative initialization mode",
+      "id": "alternative_init_mode",
+      "sbg:category": "Advanced options"
+    },
+    {
+      "description": "FMD-mapping mode only: Consider orphaned reads as valid hits when performing lightweight-alignment. This option will increase sensitivity (allow more reads to map and more transcripts to be detected), but may decrease specificity as orphaned alignments are more likely to be spurious.",
+      "type": "boolean?",
+      "sbg:toolDefaultValue": "off",
+      "label": "Allow orphans in FMD mode",
+      "id": "allow_orphans_fmd",
+      "sbg:category": "Basic options"
+    }
+  ],
+  "sbg:toolkitVersion": "0.9.1",
+  "sbg:categories": [
+    "RNA",
+    "Quantification",
+    "CWL1.0"
+  ],
+  "sbg:revisionsInfo": [
+    {
+      "sbg:revision": 0,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523623643,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-kallisto-workflows-dev/salmon-workflow-0-8-0/24"
+    },
+    {
+      "sbg:revision": 1,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-kallisto-workflows-dev/salmon-workflow-0-8-0/24"
+    },
+    {
+      "sbg:revision": 2,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-kallisto-workflows-dev/salmon-workflow-0-8-0/25"
+    },
+    {
+      "sbg:revision": 3,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-workflow-0-9-1-demo/salmon-workflow-0-9-1-cwl-1-0/0"
+    },
+    {
+      "sbg:revision": 4,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 5,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 6,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625824,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 7,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625825,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 8,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625825,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 9,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625825,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-kallisto-workflows-dev/salmon-workflow-0-8-0/26"
+    },
+    {
+      "sbg:revision": 10,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625825,
+      "sbg:revisionNotes": "Category CWL1.0 added"
+    },
+    {
+      "sbg:revision": 11,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523625825,
+      "sbg:revisionNotes": ""
+    },
+    {
+      "sbg:revision": 12,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523636657,
+      "sbg:revisionNotes": "Parameters"
+    },
+    {
+      "sbg:revision": 13,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523969026,
+      "sbg:revisionNotes": "Update input and output descriptions and set default values on some parameters"
+    },
+    {
+      "sbg:revision": 14,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523992271,
+      "sbg:revisionNotes": "Copy of uros_sipetic/salmon-kallisto-workflows-dev/salmon-workflow-0-8-0/26"
+    },
+    {
+      "sbg:revision": 15,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523992271,
+      "sbg:revisionNotes": "Rewise to exposing parameters as ports, until missing descriptions bug is fixed"
+    },
+    {
+      "sbg:revision": 16,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1523992271,
+      "sbg:revisionNotes": "Rewise to exposing parameters as ports, until missing descriptions and default params bug is fixed"
+    },
+    {
+      "sbg:revision": 17,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1524746254,
+      "sbg:revisionNotes": "Add proper default values to the workflow."
+    },
+    {
+      "sbg:revision": 18,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1529412848,
+      "sbg:revisionNotes": "Update mem requirements"
+    },
+    {
+      "sbg:revision": 19,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1545143135,
+      "sbg:revisionNotes": "Add ALI Instance Hint"
+    },
+    {
+      "sbg:revision": 20,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1545923653,
+      "sbg:revisionNotes": "Update docker image on SBG Pair FASTQs by Metadata"
+    }
+  ],
+  "description": "The **Salmon workflow** infers maximum likelihood estimates of transcript abundances from RNA-Seq data using a process called **Quasi-mapping**.\n\n**Quasi-mapping** is a process of assigning reads to transcripts without doing an exact base-to-base alignment. The **Salmon** tool implements a procedure geared towards knowing the transcript from which a read originates rather than the actual mapping coordinates, since the former is crucial to estimating transcript abundances [1, 2]. \n\nThe result is a software running at speeds orders of magnitude faster than other tools which utilize the full likelihood model while obtaining near-optimal probabilistic RNA-seq quantification results [1, 2, 3]. \n\nThe latest version of Salmon (0.9.x) introduces some novel concepts, like **Rich Factorization Classes**, which further increases the precision of the results, at a very negligible increase in runtime. This version of Salmon also supports quantification from already aligned BAM files, utilizing the full likelihood model (the same one as in RSEM), whereby the results are the same as RSEM but the execution time is much shorter than in RSEM, this time due only to engineering [3].\n\n*A list of **all inputs and parameters** with corresponding descriptions can be found at the bottom of this page.*\n\n### Common Use Cases\n\n- The workflow consists of three steps: **Salmon Index**, **Salmon Quant**, and **Salmon Quantmerge**.\n- The main input to the workflow are **FASTQ read files** (single end or paired end). \n- A **Transcriptome FASTA file** (`--transcripts`) also needs to be provided in addition to an optional **Gene map** (`--geneMap`) file (which should be of the same annotations that were used in generating the **Transcriptome FASTA file** - usually a GTF file can be provided here) if gene-level abundance results are desired. \n- An already generated **Salmon index archive** can be provided to the **Salmon Index** tool (**Transcriptome FASTA or Salmon Index Archive** input) in order to skip indexing and save some time. \n- The workflow will generate transcript abundance estimates in plaintext format (**Transcript Abundance Estimates**), and an optional file containing **Gene Abundance Estimates**, if the input **Gene map** (`--gene-map`) file is provided. \n- In addition to the default output (**Quantification file**), additional outputs can be produced if the proper options are turned on for them (e.g. **Equivalent class counts** by setting `--dumpEq`, **Unmapped reads** by setting `--writeUnmappedNames`, **Bootstrap data** by setting `--numBootstraps` or `--numGibbsSamples`, **Mapping info** by setting `--write-mappings`...).\n- A **Transcript Expression Matrix** and a **Gene Expression Matrix** will be generated if more than one sample is provided. \n- The **GC bias correction** option (`--gcBias`) will correct for GC bias and improve quantification accuracy but at the cost of increased runtime (a rough estimate would be a **double** increase in runtime per sample). \n- The workflow is optimized to run in scatter mode. To run it successfully, just supply it with multiple samples (paired end or single end, with properly filled out **Sample ID** and **Paired End** metadata). \n- The use of *data-driven likelihood factorization* is turned on with the **Range factorization bins** parameter (`--rangeFactorizationBins=4`) by default in this workflow, as it can bring an increase in accuracy at a very small increase in runtime [3]. \n- The **Salmon Quant archive** output can be used for downstream differential expression analysis tools, like Sleuth. \n\n### Changes Introduced by Seven Bridges\n\n- All output files will be prefixed by the input sample ID (inferred from the **Sample ID** metadata if existent, of from filename otherwise), instead of having identical names between runs. \n\n### Common Issues and Important Notes\n\n- For paired-end read files, it is important to properly set the **Paired End** metadata field on your read files.\n- The input FASTA file (if provided instead of the already generated Salmon index archive) should be a transcriptome FASTA, not a genomic FASTA.\n- For FASTQ reads in multi-file format (i.e. two FASTQ files for paired-end 1 and two FASTQ files for paired-end2), the proper metadata needs to be set (the following hierarchy is valid: **Sample ID/Library ID/Platform Unit ID/File Segment Number)**.\n- The GTF and FASTA files need to have compatible transcript IDs. \n\n### Performance Benchmarking\n\nThe main advantage of the Salmon software is that it is not computationally challenging, as alignment in the traditional sense is not performed. Therefore, it is optimized to be run in scatter mode, so a c4.8xlarge instance (AWS) is used by default. \nBelow is a table describing the runtimes and task costs for a couple of samples with different file sizes:\n\n| Experiment type |  Input size | Paired-end | # of reads | Read length | Duration |  Cost |  Instance (AWS) |\n|:---------------:|:-----------:|:----------:|:----------:|:-----------:|:--------:|:-----:|:----------:|\n|     RNA-Seq     |  4 x 4.5 GB |     Yes    |     20M     |     101     |   16min   | $0.40| c4.8xlarge |\n|     RNA-Seq     | 2 x 17.4 GB, 2 x 19 GB |     Yes    |     76M & 84M    |     101     |   45min  | $1.20 | c4.8xlarge |\n\n*Cost can be significantly reduced by using **spot instances**. Visit the [Knowledge Center](https://docs.sevenbridges.com/docs/about-spot-instances) for more details.*\n\n### API Python Implementation\nThe workflow's draft task can also be submitted via the **API**. In order to learn how to get your **Authentication token** and **API endpoint** for corresponding platform visit our [documentation](https://github.com/sbg/sevenbridges-python#authentication-and-configuration).\n\n```python\nfrom sevenbridges import Api\n\n# Enter api credentials\nauthentication_token, api_endpoint = \"enter_your_token\", \"enter_api_endpoint\"\napi = Api(token=authentication_token, url=api_endpoint)\n\n# Get project_id/workflow_id from your address bar. Example: https://igor.sbgenomics.com/u/your_username/project/workflow\nproject_id, workflow_id = \"your_username/project\", \"your_username/project/workflow\"\n\n# Get file names from files in your project. File names below are just as an example.\ninputs = {\n        'reads': list(api.files.query(project=project_id, names=['sample_pe1.fq', 'sample_pe2.fq'])),\n        'gtf': list(api.files.query(project=project_id, names=['gtf_file.gtf'])),\n        'transcriptome_fasta_or_salmon_index_archive': list(api.files.query(project=project_id, names=['transcriptome_fasta_file.fa']))\n        }\n\n# Run the task\ntask = api.tasks.create(name='Salmon 0.9.1 workflow - API Example', project=project_id, app=workflow_id, inputs=inputs, run=True)\n```\nInstructions for installing and configuring the API Python client, are provided on [github](https://github.com/sbg/sevenbridges-python#installation). For more information about using the API Python client, consult [sevenbridges-python documentation](http://sevenbridges-python.readthedocs.io/en/latest/). **More examples** are available [here](https://github.com/sbg/okAPI).\n\nAdditionally, [API R](https://github.com/sbg/sevenbridges-r) and [API Java](https://github.com/sbg/sevenbridges-java) clients are available. To learn more about using these API clients please refer to the [API R client documentation](https://sbg.github.io/sevenbridges-r/), and [API Java client documentation](https://docs.sevenbridges.com/docs/java-library-quickstart).\n\n### References\n\n[1] [Salmon paper](biorxiv.org/content/biorxiv/early/2016/08/30/021592.full.pdf)   \n[2] [Rapmap paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4908361/)   \n[3] [Data-driven likelihood factorization](https://academic.oup.com/bioinformatics/article/33/14/i142/3953977)",
+  "sbg:expand_workflow": false,
+  "sbg:canvas_zoom": 0.6999999999999997,
+  "outputs": [
+    {
+      "description": "File with the names of reads (or mates in paired-end reads) that do not map to the transcriptome.",
+      "sbg:x": 1128.7589372907369,
+      "sbg:fileTypes": "TXT",
+      "sbg:y": -25.76091221400644,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/unmapped_reads"
+      ],
+      "required": false,
+      "id": "unmapped_reads",
+      "label": "Unmapped reads",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "Salmon Quant output file, containing transcript abundance estimates.",
+      "sbg:x": 1395.0780378069203,
+      "sbg:fileTypes": "SF",
+      "sbg:y": 38.57349940708707,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/quant_sf"
+      ],
+      "required": false,
+      "id": "quant_sf",
+      "label": "Transcript abundance estimates",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "Salmon Quant output file, containing aggregated gene-level abundance estimates.",
+      "sbg:x": 1398.3593750000007,
+      "sbg:fileTypes": "SF",
+      "sbg:y": 471.95744105747804,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/quant_genes_sf"
+      ],
+      "required": false,
+      "id": "quant_genes_sf",
+      "label": "Gene abundance estimates",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "Information about the quasi-mappings Salmon Quant uses for quantification.",
+      "sbg:x": 1140.326102120536,
+      "sbg:fileTypes": "SAM",
+      "sbg:y": 545.0930786132815,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/mapping_info"
+      ],
+      "required": false,
+      "id": "mapping_info",
+      "label": "Mapping info",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "A TAR bundle containing the bootstrap folder, if bootstrapping was performed.",
+      "sbg:x": 1141.6651262555806,
+      "sbg:fileTypes": "TAR",
+      "sbg:y": 685.0272478376119,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/bootstrap_data"
+      ],
+      "required": false,
+      "id": "bootstrap_data",
+      "label": "Bootstrap data",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "A file that contains the equivalence classes and corresponding counts that were computed during quasi-mapping.",
+      "sbg:x": 1401.7817905970987,
+      "sbg:fileTypes": "TXT",
+      "sbg:y": 614.6217564174111,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/eq_classes"
+      ],
+      "required": false,
+      "id": "eq_classes",
+      "label": "Equivalence classes",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "A matrix of TPM values for transcript expression data, aggregated across all input samples.",
+      "sbg:x": 1397.6690673828132,
+      "sbg:fileTypes": "TXT",
+      "sbg:y": 185.18794468470992,
+      "type": "File?",
+      "outputSource": [
+        "SBG_Create_Expression_Matrix___Transcripts/expression_matrix"
+      ],
+      "required": false,
+      "id": "transcript_expression_matrix",
+      "label": "Transcript Expression Matrix",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "A matrix of TPM values for gene expression data, aggregated across all input samples.",
+      "sbg:x": 1399.3231201171882,
+      "sbg:fileTypes": "TXT",
+      "sbg:y": 335.6390380859377,
+      "type": "File?",
+      "outputSource": [
+        "SBG_Create_Expression_Matrix___Genes/expression_matrix"
+      ],
+      "required": false,
+      "id": "gene_expression_matrix",
+      "label": "Gene Expression Matrix",
+      "sbg:includeInPorts": true
+    },
+    {
+      "description": "Archive with all files outputted by Salmon Quant. This archive can be used with downstream differential expression tools like Sleuth.",
+      "sbg:x": 1135.7143729073664,
+      "sbg:fileTypes": "TAR",
+      "sbg:y": 118.57138497488872,
+      "type": "File?",
+      "outputSource": [
+        "Salmon_Quant___Reads/salmon_quant_archive"
+      ],
+      "id": "salmon_quant_archive",
+      "label": "Salmon Quant archive",
+      "sbg:includeInPorts": true
+    }
+  ],
+  "sbg:image_url": "https://igor.sbgenomics.com/ns/brood/images/admin/sbg-public-data/salmon-workflow-0-9-1-cwl-1-0/20.png",
+  "sbg:publisher": "sbg",
+  "$namespaces": {
+    "sbg": "https://sevenbridges.com"
+  },
+  "sbg:license": "GNU General Public License v3.0 only",
+  "class": "Workflow",
+  "sbg:content_hash": "a7c24f1e707c26cf9c1b394af32a9883c5bd86486d14d29c8c652eeb33ce07763",
+  "sbg:links": [
+    {
+      "label": "Salmon Homepage",
+      "id": "http://combine-lab.github.io/salmon/"
+    },
+    {
+      "label": "Salmon Source Code",
+      "id": "https://github.com/COMBINE-lab/salmon"
+    },
+    {
+      "label": "Salmon Download",
+      "id": "https://github.com/COMBINE-lab/salmon/releases/tag/v0.9.1"
+    },
+    {
+      "label": "Salmon Publications",
+      "id": "http://biorxiv.org/content/early/2015/10/03/021592"
+    },
+    {
+      "label": "Salmon Documentation",
+      "id": "http://salmon.readthedocs.org/en/latest/"
+    }
+  ],
+  "sbg:toolkit": "Salmon",
+  "sbg:projectName": "SBG Public Data",
+  "sbg:appVersion": [
+    "v1.0"
+  ],
+  "id": "https://api.sbgenomics.com/v2/apps/admin/sbg-public-data/salmon-workflow-0-9-1-cwl-1-0/20/raw/",
+  "sbg:id": "admin/sbg-public-data/salmon-workflow-0-9-1-cwl-1-0/20",
+  "sbg:revision": 20,
+  "sbg:revisionNotes": "Update docker image on SBG Pair FASTQs by Metadata",
+  "sbg:modifiedOn": 1545923653,
+  "sbg:modifiedBy": "admin",
+  "sbg:createdOn": 1523623643,
+  "sbg:createdBy": "admin",
+  "sbg:project": "admin/sbg-public-data",
+  "sbg:sbgMaintained": false,
+  "sbg:validationErrors": [],
+  "sbg:contributors": [
+    "admin"
+  ],
+  "sbg:latestRevision": 20
+}

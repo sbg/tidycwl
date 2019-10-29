@@ -1,0 +1,1347 @@
+{
+  "requirements": [
+    {
+      "class": "ExpressionEngineRequirement",
+      "requirements": [
+        {
+          "class": "DockerRequirement",
+          "dockerPull": "rabix/js-engine"
+        }
+      ],
+      "id": "#cwl-js-engine"
+    }
+  ],
+  "outputs": [
+    {
+      "outputBinding": {
+        "sbg:inheritMetadataFrom": "#input_reads",
+        "secondaryFiles": [
+          ".bai",
+          "^.bai",
+          ".crai",
+          "^.crai"
+        ],
+        "glob": "{*.sam,*.bam,*.cram}",
+        "sbg:metadata": {
+          "reference_genome": {
+            "class": "Expression",
+            "script": "{\n  reference_file = $job.inputs.reference_index_tar.path.split('/')[$job.inputs.reference_index_tar.path.split('/').length-1]\n  name = reference_file.slice(0, -4) // cut .tar extension \n  \n  name_list = name.split('.')\n  ext = name_list[name_list.length-1]\n\n  if (ext == 'gz' || ext == 'GZ'){\n    a = name_list.pop() // strip fasta.gz\n    a = name_list.pop()\n  } else\n    a = name_list.pop() //strip only fasta/fa\n  \n  return name_list.join('.')\n  \n}",
+            "engine": "#cwl-js-engine"
+          }
+        }
+      },
+      "description": "Aligned reads.",
+      "label": "Aligned SAM/BAM",
+      "type": [
+        "null",
+        "File"
+      ],
+      "id": "#aligned_reads",
+      "sbg:fileTypes": "SAM, BAM, CRAM"
+    },
+    {
+      "outputBinding": {
+        "glob": "*.sormadup_metrics.log"
+      },
+      "description": "Metrics file for biobambam mark duplicates",
+      "label": "Sormadup metrics",
+      "type": [
+        "null",
+        "File"
+      ],
+      "id": "#dups_metrics",
+      "sbg:fileTypes": "LOG"
+    }
+  ],
+  "sbg:toolkitVersion": "0.7.17",
+  "hints": [
+    {
+      "class": "sbg:CPURequirement",
+      "value": {
+        "class": "Expression",
+        "script": "{  \n  // Calculate suggested number of CPUs depending of the input reads size\n  if ($job.inputs.input_reads.constructor == Array){\n    if ($job.inputs.input_reads[1]){\n      reads_size = $job.inputs.input_reads[0].size + $job.inputs.input_reads[1].size\n    } else{\n      reads_size = $job.inputs.input_reads[0].size\n    }\n  }\n  else{\n    reads_size = $job.inputs.input_reads.size\n  }\n  if(!reads_size) { reads_size = 0 }\n\n\n  GB_1 = 1024*1024*1024\n  if(reads_size < GB_1){ suggested_cpus = 1 }\n  else if(reads_size < 10 * GB_1){ suggested_cpus = 8 }\n  else { suggested_cpus = 31 }\n  \n  if($job.inputs.reserved_threads){ return $job.inputs.reserved_threads }\n  else if($job.inputs.threads){ return $job.inputs.threads } \n  else if($job.inputs.sambamba_threads) { return $job.inputs.sambamba_threads }\n  else{    return suggested_cpus  }\n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "class": "sbg:MemRequirement",
+      "value": {
+        "class": "Expression",
+        "script": "{  \n\n  // Calculate suggested number of CPUs depending of the input reads size\n  if ($job.inputs.input_reads.constructor == Array){\n    if ($job.inputs.input_reads[1]){\n      reads_size = $job.inputs.input_reads[0].size + $job.inputs.input_reads[1].size\n    } else{\n      reads_size = $job.inputs.input_reads[0].size\n    }\n  }\n  else{\n    reads_size = $job.inputs.input_reads.size\n  }\n  if(!reads_size) { reads_size = 0 }\n \n  GB_1 = 1024*1024*1024\n  if(reads_size < GB_1){ suggested_memory = 4 }\n  else if(reads_size < 10 * GB_1){ suggested_memory = 15 }\n  else { suggested_memory = 58 }\n  \n  if($job.inputs.total_memory){  \t\n    return  $job.inputs.total_memory* 1024  \n  } \n  else if($job.inputs.sort_memory){\n    return  $job.inputs.sort_memory* 1024\n  }\n  else{  \t\n    return suggested_memory * 1024  \n  }\n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "class": "DockerRequirement",
+      "dockerPull": "images.sbgenomics.com/vladimirk/bwa_biobambam2:0.7.17"
+    }
+  ],
+  "inputs": [
+    {
+      "description": "Reference fasta file with BWA index files packed in TAR.",
+      "label": "Reference Index TAR",
+      "type": [
+        "File"
+      ],
+      "id": "#reference_index_tar",
+      "sbg:stageInput": "link",
+      "sbg:fileTypes": "TAR",
+      "sbg:category": "Input files"
+    },
+    {
+      "description": "Input sequence reads.",
+      "label": "Input reads",
+      "type": [
+        {
+          "items": "File",
+          "type": "array"
+        }
+      ],
+      "id": "#input_reads",
+      "sbg:stageInput": "link",
+      "sbg:fileTypes": "FASTQ, FASTQ.GZ, FQ, FQ.GZ",
+      "sbg:category": "Input files"
+    },
+    {
+      "sbg:toolDefaultValue": "8",
+      "description": "Number of threads for BWA, Samblaster and Sambamba sort process.",
+      "label": "Threads",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#threads",
+      "sbg:category": "Execution"
+    },
+    {
+      "sbg:toolDefaultValue": "19",
+      "description": "Minimum seed length for BWA MEM.",
+      "label": "Minimum seed length",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#minimum_seed_length",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-k",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "100",
+      "description": "Off-diagonal X-dropoff.",
+      "label": "Dropoff",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#dropoff",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-d",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "1.5",
+      "description": "Look for internal seeds inside a seed longer than {-k} * FLOAT.",
+      "label": "Select seeds",
+      "type": [
+        "null",
+        "float"
+      ],
+      "id": "#select_seeds",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-r",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "20",
+      "description": "Seed occurrence for the 3rd round seeding.",
+      "label": "Seed occurrence for the 3rd round",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#seed_occurrence_for_the_3rd_round",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-y",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "500",
+      "description": "Skip seeds with more than INT occurrences.",
+      "label": "Skip seeds with more than INT occurrences",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#skip_seeds",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-c",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "0.50",
+      "description": "Drop chains shorter than FLOAT fraction of the longest overlapping chain.",
+      "label": "Drop chains fraction",
+      "type": [
+        "null",
+        "float"
+      ],
+      "id": "#drop_chains_fraction",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-D",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "0",
+      "description": "Discard a chain if seeded bases shorter than INT.",
+      "label": "Discard chain length",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#discard_chain_length",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-W",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "50",
+      "description": "Perform at most INT rounds of mate rescues for each read.",
+      "label": "Mate rescue rounds",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#mate_rescue_rounds",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-m",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "description": "Skip mate rescue.",
+      "label": "Skip mate rescue",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#skip_mate_rescue",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-S",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "description": "Skip pairing; mate rescue performed unless -S also in use.",
+      "label": "Skip pairing",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#skip_pairing",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-P",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "description": "Discard full-length exact matches.",
+      "label": "Discard exact matches",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#discard_exact_matches",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-e",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "1",
+      "description": "Score for a sequence match, which scales options -TdBOELU unless overridden.",
+      "label": "Score for a sequence match",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#score_for_a_sequence_match",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-A",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "sbg:toolDefaultValue": "4",
+      "description": "Penalty for a mismatch.",
+      "label": "Mismatch penalty",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#mismatch_penalty",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-B",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "description": "Smart pairing in input FASTQ file (ignoring in2.fq).",
+      "label": "Smart pairing in input FASTQ file",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#smart_pairing_in_input_fastq",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-p",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "sbg:toolDefaultValue": "Constructed from per-attribute parameters or inferred from metadata.",
+      "description": "Read group header line such as '@RG\\tID:foo\\tSM:bar'.  This value takes precedence over per-attribute parameters.",
+      "label": "Read group header",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#read_group_header",
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "description": "Insert STR to header if it starts with @; or insert lines in FILE.",
+      "label": "Insert string to output SAM or BAM header",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#insert_string_to_header",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-H",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Treat ALT contigs as part of the primary assembly (i.e. ignore <idxbase>.alt file).",
+      "label": "Ignore ALT file",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#ignore_alt_file",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-j",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "sbg:toolDefaultValue": "3",
+      "description": "Verbose level: 1=error, 2=warning, 3=message, 4+=debugging.",
+      "label": "Verbose level",
+      "type": [
+        "null",
+        {
+          "name": "verbose_level",
+          "symbols": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "type": "enum"
+        }
+      ],
+      "id": "#verbose_level",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-v",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "sbg:toolDefaultValue": "30",
+      "description": "Minimum alignment score for a read to be output in SAM/BAM.",
+      "label": "Minimum alignment score for a read to be output in SAM/BAM",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#minimum_output_score",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-T",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Output all alignments for SE or unpaired PE.",
+      "label": "Output alignments",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#output_alignments",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-a",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Append FASTA/FASTQ comment to SAM output.",
+      "label": "Append comment",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#append_comment",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-C",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Output the reference FASTA header in the XR tag.",
+      "label": "Output header",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#output_header",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-V",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Use soft clipping for supplementary alignments.",
+      "label": "Use soft clipping",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#use_soft_clipping",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-Y",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Mark shorter split hits as secondary.",
+      "label": "Mark shorter",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#mark_shorter",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-M",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "sbg:toolDefaultValue": "[6,6]",
+      "description": "Gap open penalties for deletions and insertions. This array can't have more than two values.",
+      "label": "Gap open penalties",
+      "type": [
+        "null",
+        {
+          "items": "int",
+          "type": "array"
+        }
+      ],
+      "id": "#gap_open_penalties",
+      "inputBinding": {
+        "position": 0,
+        "separate": false,
+        "prefix": "-O",
+        "sbg:cmdInclude": true,
+        "itemSeparator": ","
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "sbg:toolDefaultValue": "[1,1]",
+      "description": "Gap extension penalty; a gap of size k cost '{-O} + {-E}*k'. This array can't have more than two values.",
+      "label": "Gap extension",
+      "type": [
+        "null",
+        {
+          "items": "int",
+          "type": "array"
+        }
+      ],
+      "id": "#gap_extension_penalties",
+      "inputBinding": {
+        "position": 0,
+        "separate": false,
+        "prefix": "-E",
+        "sbg:cmdInclude": true,
+        "itemSeparator": ","
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "sbg:toolDefaultValue": "[5,5]",
+      "description": "Penalty for 5'- and 3'-end clipping.",
+      "label": "Clipping penalty",
+      "type": [
+        "null",
+        {
+          "items": "int",
+          "type": "array"
+        }
+      ],
+      "id": "#clipping_penalty",
+      "inputBinding": {
+        "position": 0,
+        "separate": false,
+        "prefix": "-L",
+        "sbg:cmdInclude": true,
+        "itemSeparator": ","
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "sbg:toolDefaultValue": "17",
+      "description": "Penalty for an unpaired read pair.",
+      "label": "Unpaired read penalty",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#unpaired_read_penalty",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-U",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "description": "Sequencing technology-specific settings; Setting -x changes multiple parameters unless overriden. pacbio: -k17 -W40 -r10 -A1 -B1 -O1 -E1 -L0  (PacBio reads to ref). ont2d: -k14 -W20 -r10 -A1 -B1 -O1 -E1 -L0  (Oxford Nanopore 2D-reads to ref). intractg: -B9 -O16 -L5  (intra-species contigs to ref).",
+      "label": "Sequencing technology-specific settings",
+      "type": [
+        "null",
+        {
+          "name": "read_type",
+          "symbols": [
+            "pacbio",
+            "ont2d",
+            "intractg"
+          ],
+          "type": "enum"
+        }
+      ],
+      "id": "#read_type",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-x",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Scoring options"
+    },
+    {
+      "sbg:toolDefaultValue": "[5, 200]",
+      "description": "If there are <INT hits with score >80% of the max score, output all in XA. This array should have no more than two values.",
+      "label": "Output in XA",
+      "type": [
+        "null",
+        {
+          "items": "int",
+          "type": "array"
+        }
+      ],
+      "id": "#output_in_xa",
+      "inputBinding": {
+        "position": 0,
+        "separate": false,
+        "prefix": "-h",
+        "sbg:cmdInclude": true,
+        "itemSeparator": ","
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "description": "Specify the mean, standard deviation (10% of the mean if absent), max (4 sigma from the mean if absent) and min of the insert size distribution.FR orientation only. This array can have maximum four values, where first two should be specified as FLOAT and last two as INT.",
+      "label": "Specify distribution parameters",
+      "type": [
+        "null",
+        {
+          "items": "float",
+          "type": "array"
+        }
+      ],
+      "id": "#speficy_distribution_parameters",
+      "inputBinding": {
+        "position": 0,
+        "separate": false,
+        "prefix": "-I",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Input/output options"
+    },
+    {
+      "sbg:toolDefaultValue": "100",
+      "description": "Band width for banded alignment.",
+      "label": "Band width",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#band_width",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-w",
+        "sbg:cmdInclude": true
+      },
+      "sbg:category": "BWA Algorithm options"
+    },
+    {
+      "sbg:toolDefaultValue": "Inferred from metadata",
+      "description": "Specify the version of the technology that was used for sequencing, which will be placed in RG line.",
+      "label": "Platform",
+      "type": [
+        "null",
+        {
+          "name": "rg_platform",
+          "symbols": [
+            "454",
+            "Helicos",
+            "Illumina",
+            "Solid",
+            "IonTorrent"
+          ],
+          "type": "enum"
+        }
+      ],
+      "id": "#rg_platform",
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "sbg:toolDefaultValue": "Inferred from metadata",
+      "description": "Specify the sample ID for RG line - A human readable identifier for a sample or specimen, which could contain some metadata information. A sample or specimen is material taken from a biological entity for testing, diagnosis, propagation, treatment, or research purposes, including but not limited to tissues, body fluids, cells, organs, embryos, body excretory products, etc.",
+      "label": "Sample ID",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#rg_sample_id",
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "sbg:toolDefaultValue": "Inferred from metadata",
+      "description": "Specify the identifier for the sequencing library preparation, which will be placed in RG line.",
+      "label": "Library ID",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#rg_library_id",
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "sbg:toolDefaultValue": "Inferred from metadata",
+      "description": "Specify the platform unit (lane/slide) for RG line - An identifier for lanes (Illumina), or for slides (SOLiD) in the case that a library was split and ran over multiple lanes on the flow cell or slides.",
+      "label": "Platform unit ID",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#rg_platform_unit_id",
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "id": "#rg_data_submitting_center",
+      "description": "Specify the data submitting center for RG line.",
+      "label": "Data submitting center",
+      "type": [
+        "null",
+        "string"
+      ],
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "id": "#rg_median_fragment_length",
+      "description": "Specify the median fragment length for RG line.",
+      "label": "Median fragment length",
+      "type": [
+        "null",
+        "string"
+      ],
+      "sbg:category": "BWA Read Group Options"
+    },
+    {
+      "sbg:toolDefaultValue": "Coordinate Sorted BAM",
+      "description": "Cordinate sort is default output.",
+      "label": "Output format",
+      "type": [
+        "null",
+        {
+          "name": "output_format",
+          "symbols": [
+            "SAM",
+            "BAM",
+            "CRAM",
+            "Queryname Sorted BAM",
+            "Queryname Sorted SAM"
+          ],
+          "type": "enum"
+        }
+      ],
+      "id": "#output_format",
+      "sbg:category": "Execution"
+    },
+    {
+      "id": "#sort_memory",
+      "description": "Amount of RAM [Gb] to give to the sorting algorithm (if not provided will be set to one third of the total memory).",
+      "label": "Memory for BAM sorting",
+      "type": [
+        "null",
+        "int"
+      ],
+      "sbg:category": "Execution"
+    },
+    {
+      "sbg:toolDefaultValue": "MarkDuplicates",
+      "description": "Use Samblaster for finding duplicates on sequence reads.",
+      "label": "PCR duplicate detection",
+      "type": [
+        "null",
+        {
+          "name": "deduplication",
+          "symbols": [
+            "None",
+            "MarkDuplicates",
+            "RemoveDuplicates"
+          ],
+          "type": "enum"
+        }
+      ],
+      "id": "#deduplication",
+      "sbg:category": "Samblaster parameters"
+    },
+    {
+      "sbg:toolDefaultValue": "15",
+      "description": "Total memory to be used by the tool in GB. It's sum of BWA, Sambamba Sort and Samblaster. For fastq files of total size less than 10GB, we suggest using the default setting of 15GB, for larger files we suggest using 58GB of memory (and 32CPU cores).",
+      "label": "Total memory",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#total_memory",
+      "sbg:stageInput": null,
+      "sbg:category": "Execution"
+    },
+    {
+      "sbg:toolDefaultValue": "False",
+      "description": "Filter out secondary alignments. Sambamba view tool will be used to perform this internally.",
+      "label": "Filter out secondary alignments",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#filter_out_secondary_alignments",
+      "sbg:stageInput": null,
+      "sbg:category": "Execution"
+    },
+    {
+      "id": "#output_name",
+      "description": "Name of the output BAM file.",
+      "label": "Output SAM/BAM file name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "sbg:category": "Configuration"
+    },
+    {
+      "sbg:toolDefaultValue": "1",
+      "description": "Reserved number of threads on the instance used by scheduler.",
+      "label": "Reserved number of threads on the instance",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#reserved_threads",
+      "sbg:stageInput": null,
+      "sbg:category": "Configuration"
+    },
+    {
+      "sbg:toolDefaultValue": "1",
+      "description": "Read group ID",
+      "label": "Read group ID",
+      "type": [
+        "null",
+        "string"
+      ],
+      "id": "#rg_id",
+      "sbg:category": "Configuration"
+    },
+    {
+      "sbg:toolDefaultValue": "False",
+      "description": "Lower the number of threads if HG38 reference genome is used.",
+      "label": "Optimize threads for HG38",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#wgs_hg38_mode_threads",
+      "sbg:stageInput": null,
+      "sbg:category": "Execution"
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "for split alignment, take the alignment with the smallest coordinate as primary.",
+      "label": "Split alignment smallest coordinate as primary",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#split_alignment_primary",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-5",
+        "sbg:cmdInclude": true
+      }
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "Don't modify mapQ of supplementary alignments",
+      "label": "Don't modify mapQ of supplementary alignments",
+      "type": [
+        "null",
+        "boolean"
+      ],
+      "id": "#mapQ_of_suplementary",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-q",
+        "sbg:cmdInclude": true
+      }
+    },
+    {
+      "sbg:stageInput": null,
+      "description": "process INT input bases in each batch regardless of nThreads (for reproducibility)",
+      "label": "process INT input bases in each batch (for reproducibility)",
+      "type": [
+        "null",
+        "int"
+      ],
+      "id": "#num_input_bases_in_each_batch",
+      "inputBinding": {
+        "position": 0,
+        "separate": true,
+        "prefix": "-K",
+        "sbg:cmdInclude": true
+      }
+    }
+  ],
+  "sbg:image_url": null,
+  "cwlVersion": "sbg:draft-2",
+  "sbg:expand_workflow": false,
+  "sbg:license": "BWA: GNU Affero General Public License v3.0, MIT License. Sambamba: GNU GENERAL PUBLIC LICENSE. Samblaster: The MIT License (MIT)",
+  "arguments": [
+    {
+      "position": 112,
+      "separate": false,
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  ///////////////////////////////////////////\n ///  BIOBAMBAM BAMSORMADUP   //////////////////////\n///////////////////////////////////////////\n  \nfunction common_substring(a,b) {\n  var i = 0;\n  while(a[i] === b[i] && i < a.length)\n  {\n    i = i + 1;\n  }\n\n  return a.slice(0, i);\n}\n\n   // Set output file name\n  if($job.inputs.input_reads[0] instanceof Array){\n    input_1 = $job.inputs.input_reads[0][0] // scatter mode\n    input_2 = $job.inputs.input_reads[0][1]\n  } else if($job.inputs.input_reads instanceof Array){\n    input_1 = $job.inputs.input_reads[0]\n    input_2 = $job.inputs.input_reads[1]\n  }else {\n    input_1 = [].concat($job.inputs.input_reads)[0]\n    input_2 = input_1\n  }\n  full_name = input_1.path.split('/')[input_1.path.split('/').length-1] \n  \n  if($job.inputs.output_name){name = $job.inputs.output_name }\n  else if ($job.inputs.input_reads.length == 1){\n    name = full_name\n    if(name.slice(-3, name.length) === '.gz' || name.slice(-3, name.length) === '.GZ')\n      name = name.slice(0, -3)   \n    if(name.slice(-3, name.length) === '.fq' || name.slice(-3, name.length) === '.FQ')\n      name = name.slice(0, -3)\n    if(name.slice(-6, name.length) === '.fastq' || name.slice(-6, name.length) === '.FASTQ')\n      name = name.slice(0, -6)\n       \n  }else{\n    full_name2 = input_2.path.split('/')[input_2.path.split('/').length-1] \n    name = common_substring(full_name, full_name2)\n    \n    if(name.slice(-1, name.length) === '_' || name.slice(-1, name.length) === '.')\n      name = name.slice(0, -1)\n    if(name.slice(-2, name.length) === 'p_' || name.slice(-1, name.length) === 'p.')\n      name = name.slice(0, -2)\n    if(name.slice(-2, name.length) === 'P_' || name.slice(-1, name.length) === 'P.')\n      name = name.slice(0, -2)\n    if(name.slice(-3, name.length) === '_p_' || name.slice(-3, name.length) === '.p.')\n      name = name.slice(0, -3)\n    if(name.slice(-3, name.length) === '_pe' || name.slice(-3, name.length) === '.pe')\n      name = name.slice(0, -3)\n  }\n\n  //////////////////////////\n  // Set sort memory size\n  \n  reads_size = 0 // Not used because of situations when size does not exist!\n  GB_1 = 1024*1024*1024\n  if(reads_size < GB_1){ \n    suggested_memory = 4\n    suggested_cpus = 1\n  }\n  else if(reads_size < 10 * GB_1){ \n    suggested_memory = 15\n    suggested_cpus = 8\n  }\n  else { \n    suggested_memory = 58 \n    suggested_cpus = 31\n  }\n  \n  \n  if(!$job.inputs.total_memory){ total_memory = suggested_memory }\n  else{ total_memory = $job.inputs.total_memory }\n\n  // TODO:Rough estimation, should be fine-tuned!\n  if(total_memory > 16){ sorter_memory = parseInt(total_memory / 3) }\n  else{ sorter_memory = 5 }\n          \n  if ($job.inputs.sort_memory){\n    sorter_memory_string = $job.inputs.sort_memory +'GiB'\n  }\n  else sorter_memory_string = sorter_memory + 'GiB' \n  \n  // Read number of threads if defined\n  if ($job.inputs.threads){\n    threads = $job.inputs.threads\n  }\n  else if ($job.inputs.wgs_hg38_mode_threads){\n    MAX_THREADS = 36\n    ref_name_arr = $job.inputs.reference_index_tar.path.split('/')\n    ref_name = ref_name_arr[ref_name_arr.length - 1]\n    if (ref_name.search('38') >= 0){threads = $job.inputs.wgs_hg38_mode_threads}\n    else {threads = MAX_THREADS}\n  }\n  else { threads = 8 }\n  \n  \n  \n  if ($job.inputs.deduplication == \"MarkDuplicates\"){\n    dedup = ' markduplicates=1'\n  }\n  else if ($job.inputs.deduplication == \"RemoveDuplicates\"){\n    dedup = ' rmdup=1'\n  }\n  else{\n   dedup = '' \n  }\n  \n  sort_path = 'bamsormadup'\n  indexfilename = ' '\n  // Coordinate Sorted BAM is default\n  if ($job.inputs.output_format == 'CRAM'){\n    out_format = ' outputformat=cram SO=coordinate'\n    ref_name_arr = $job.inputs.reference_index_tar.path.split('/')\n    ref_name = ref_name_arr[ref_name_arr.length - 1].split('.tar')[0]\n    out_format += ' reference=' + ref_name\n    indexfilename = ' indexfilename=' + name + '.cram.crai'\n    extension = '.cram'    \n  }else if($job.inputs.output_format == 'SAM'){\n    out_format = ' outputformat=sam SO=coordinate'\n    extension = '.sam'    \n  }else if ($job.inputs.output_format == 'Queryname Sorted BAM'){\n    out_format = ' outputformat=bam SO=queryname'\n    extension = '.bam'\n  }else if ($job.inputs.output_format == 'Queryname Sorted SAM'){\n    out_format = ' outputformat=sam SO=queryname'\n    extension = '.sam'    \n  }else {\n    out_format = ' outputformat=bam SO=coordinate'\n    indexfilename = ' indexfilename=' + name + '.bam.bai'\n    extension = '.bam'\n  }\n    cmd = \" | \" + sort_path + \" threads=\" + threads + \" level=1 tmplevel=-1 inputformat=sam\" \n    cmd += out_format\n    cmd += indexfilename\n    // capture metrics file\n    cmd += \" M=\" + name + \".sormadup_metrics.log\"\n    return cmd + ' > ' + name + extension\n\n}\n  \n",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "position": 1,
+      "separate": true,
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  \n  if($job.inputs.read_group_header){\n  \treturn '-R ' + $job.inputs.read_group_header\n  }\n    \n  function add_param(key, val){\n    if(!val){\n      return\n\t}\n    param_list.push(key + ':' + val)\n  }\n\n  param_list = []\n\n  // Set output file name\n  if($job.inputs.input_reads[0] instanceof Array){\n    input_1 = $job.inputs.input_reads[0][0] // scatter mode\n  } else if($job.inputs.input_reads instanceof Array){\n    input_1 = $job.inputs.input_reads[0]\n  }else {\n    input_1 = [].concat($job.inputs.input_reads)[0]\n  }\n  \n  //Read metadata for input reads\n  read_metadata = input_1.metadata\n  if(!read_metadata) read_metadata = []\n\n  if($job.inputs.rg_id){\n    add_param('ID', $job.inputs.rg_id)\n  }\n  else {\n    add_param('ID', '1')\n  } \n   \n  \n  if($job.inputs.rg_data_submitting_center){\n  \tadd_param('CN', $job.inputs.rg_data_submitting_center)\n  }\n  else if('data_submitting_center' in  read_metadata){\n  \tadd_param('CN', read_metadata.data_submitting_center)\n  }\n  \n  if($job.inputs.rg_library_id){\n  \tadd_param('LB', $job.inputs.rg_library_id)\n  }\n  else if('library_id' in read_metadata){\n  \tadd_param('LB', read_metadata.library_id)\n  }\n  \n  if($job.inputs.rg_median_fragment_length){\n  \tadd_param('PI', $job.inputs.rg_median_fragment_length)\n  }\n\n  \n  if($job.inputs.rg_platform){\n  \tadd_param('PL', $job.inputs.rg_platform)\n  }\n  else if('platform' in read_metadata){\n    if(read_metadata.platform == 'HiSeq X Ten'){\n      rg_platform = 'Illumina'\n    }\n    else{\n      rg_platform = read_metadata.platform\n    }\n  \tadd_param('PL', rg_platform)\n  }\n  \n  if($job.inputs.rg_platform_unit_id){\n  \tadd_param('PU', $job.inputs.rg_platform_unit_id)\n  }\n  else if('platform_unit_id' in read_metadata){\n  \tadd_param('PU', read_metadata.platform_unit_id)\n  }\n  \n  if($job.inputs.rg_sample_id){\n  \tadd_param('SM', $job.inputs.rg_sample_id)\n  }\n  else if('sample_id' in  read_metadata){\n  \tadd_param('SM', read_metadata.sample_id)\n  }\n    \n  return \"-R '@RG\\\\t\" + param_list.join('\\\\t') + \"'\"\n  \n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "position": 101,
+      "separate": true,
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  /////// Set input reads in the correct order depending of the paired end from metadata\n    \n     // Set output file name\n  if($job.inputs.input_reads[0] instanceof Array){\n    input_reads = $job.inputs.input_reads[0] // scatter mode\n  } else {\n    input_reads = $job.inputs.input_reads = [].concat($job.inputs.input_reads)\n  }\n  \n  \n  //Read metadata for input reads\n  read_metadata = input_reads[0].metadata\n  if(!read_metadata) read_metadata = []\n  \n  order = 0 // Consider this as normal order given at input: pe1 pe2\n  \n  // Check if paired end 1 corresponds to the first given read\n  if(read_metadata == []){ order = 0 }\n  else if('paired_end' in  read_metadata){ \n    pe1 = read_metadata.paired_end\n    if(pe1 != 1) order = 1 // change order\n  }\n\n  // Return reads in the correct order\n  if (input_reads.length == 1){\n    return input_reads[0].path // Only one read present\n  }\n  else if (input_reads.length == 2){\n    if (order == 0) return input_reads[0].path + ' ' + input_reads[1].path\n    else return input_reads[1].path + ' ' + input_reads[0].path\n  }\n\n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "position": 2,
+      "separate": true,
+      "prefix": "-t",
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  MAX_THREADS = 36\n  suggested_threads = 8\n  \n  if($job.inputs.threads){ threads = $job.inputs.threads  }\n  else if ($job.inputs.wgs_hg38_mode_threads){\n    ref_name_arr = $job.inputs.reference_index_tar.path.split('/')\n    ref_name = ref_name_arr[ref_name_arr.length - 1]\n    if (ref_name.search('38') >= 0){threads = $job.inputs.wgs_hg38_mode_threads}\n    else {threads = MAX_THREADS}\n  }\n  else{ threads = suggested_threads  }\n    \n  return threads\n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "position": 10,
+      "separate": true,
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  name = ''\n  metadata = [].concat($job.inputs.reference_index_tar)[0].metadata\n  \n  if (metadata && metadata.reference_genome) {\n \tname = metadata.reference_genome\n  }\n  else {\n\treference_file = $job.inputs.reference_index_tar.path.split('/')[$job.inputs.reference_index_tar.path.split('/').length-1]\n  \tname = reference_file.slice(0, -4) // cut .tar extension \n  }\n    \n  return name \t\n}",
+        "engine": "#cwl-js-engine"
+      }
+    },
+    {
+      "position": 10000,
+      "separate": true,
+      "valueFrom": {
+        "class": "Expression",
+        "script": "{\n  cmd = \";declare -i pipe_statuses=(\\\\${PIPESTATUS[*]});len=\\\\${#pipe_statuses[@]};declare -i tot=0;echo \\\\${pipe_statuses[*]};for (( i=0; i<\\\\${len}; i++ ));do if [ \\\\${pipe_statuses[\\\\$i]} -ne 0 ];then tot=\\\\${pipe_statuses[\\\\$i]}; fi;done;if [ \\\\$tot -ne 0 ]; then >&2 echo Error in piping. Pipe statuses: \\\\${pipe_statuses[*]};fi; if [ \\\\$tot -ne 0 ]; then false;fi\\\"\"\n  return cmd\n}",
+        "engine": "#cwl-js-engine"
+      }
+    }
+  ],
+  "sbg:toolAuthor": "Heng Li",
+  "$namespaces": {
+    "sbg": "https://sevenbridges.com"
+  },
+  "label": "BWA MEM Bundle",
+  "baseCommand": [
+    {
+      "class": "Expression",
+      "script": "{\n  cmd = \"/bin/bash -c \\\"\"\n  return cmd + \" export REF_CACHE=${PWD} ; \"\n}",
+      "engine": "#cwl-js-engine"
+    },
+    {
+      "class": "Expression",
+      "script": "{\n  reference_file = $job.inputs.reference_index_tar.path.split('/')[$job.inputs.reference_index_tar.path.split('/').length-1]\n  return 'tar -tvf ' +  reference_file + ' 1>&2; tar -xf ' + reference_file + ' ; '\n  \n}",
+      "engine": "#cwl-js-engine"
+    },
+    "bwa",
+    "mem"
+  ],
+  "sbg:revisionsInfo": [
+    {
+      "sbg:revision": 0,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "Copy of vladimirk/bwa-mem-bundle-0-7-13-demo/bwa-mem-bundle-0-7-13/46"
+    },
+    {
+      "sbg:revision": 1,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "init"
+    },
+    {
+      "sbg:revision": 2,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "added biobambam2 sort"
+    },
+    {
+      "sbg:revision": 3,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "dedup added"
+    },
+    {
+      "sbg:revision": 4,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "boolean inputs fixed"
+    },
+    {
+      "sbg:revision": 5,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "output written with >"
+    },
+    {
+      "sbg:revision": 6,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "sambamba and samblaster"
+    },
+    {
+      "sbg:revision": 7,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "samblaster path corrected"
+    },
+    {
+      "sbg:revision": 8,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "Added ALT Contig reference"
+    },
+    {
+      "sbg:revision": 9,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "docs"
+    },
+    {
+      "sbg:revision": 10,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "num_bases_reproducibility"
+    },
+    {
+      "sbg:revision": 11,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1532539861,
+      "sbg:revisionNotes": "Do_not_use_alt_38 parameter removed due to redundancy"
+    },
+    {
+      "sbg:revision": 12,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711358,
+      "sbg:revisionNotes": "Added new @RG options."
+    },
+    {
+      "sbg:revision": 13,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "added bamsormadup"
+    },
+    {
+      "sbg:revision": 14,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "add 'inputformat=sam'"
+    },
+    {
+      "sbg:revision": 15,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "add 'cram output support and capture reference'"
+    },
+    {
+      "sbg:revision": 16,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "capture output with + ' > ' + name + extension"
+    },
+    {
+      "sbg:revision": 17,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "capturing cram output and dups metrics file"
+    },
+    {
+      "sbg:revision": 18,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "add cram selection as an output format"
+    },
+    {
+      "sbg:revision": 19,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711359,
+      "sbg:revisionNotes": "fix output_format options"
+    },
+    {
+      "sbg:revision": 20,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "lower case outputformat=cram"
+    },
+    {
+      "sbg:revision": 21,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "fix typo"
+    },
+    {
+      "sbg:revision": 22,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "tar -tv"
+    },
+    {
+      "sbg:revision": 23,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "see tar contents"
+    },
+    {
+      "sbg:revision": 24,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "1>&2"
+    },
+    {
+      "sbg:revision": 25,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "typo"
+    },
+    {
+      "sbg:revision": 26,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "add export REF_CACHE=$CWD"
+    },
+    {
+      "sbg:revision": 27,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "export REF_CACHE=$CWD ;"
+    },
+    {
+      "sbg:revision": 28,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "REF_CACHE=$PWD"
+    },
+    {
+      "sbg:revision": 29,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "set REF_CACHE"
+    },
+    {
+      "sbg:revision": 30,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711360,
+      "sbg:revisionNotes": "link to reference_tarball"
+    },
+    {
+      "sbg:revision": 31,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711361,
+      "sbg:revisionNotes": ".bam.bai instead only .bai"
+    },
+    {
+      "sbg:revision": 32,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1553711361,
+      "sbg:revisionNotes": "_R multi lane"
+    },
+    {
+      "sbg:revision": 33,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1554195125,
+      "sbg:revisionNotes": "label version to 0.7.17"
+    },
+    {
+      "sbg:revision": 34,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1556185547,
+      "sbg:revisionNotes": "Coordinate Sorted BAM enum label"
+    },
+    {
+      "sbg:revision": 35,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1556185547,
+      "sbg:revisionNotes": "description. Threads mapped to bamsortmadup"
+    },
+    {
+      "sbg:revision": 36,
+      "sbg:modifiedBy": "admin",
+      "sbg:modifiedOn": 1556185548,
+      "sbg:revisionNotes": "-q -5 boolean fix!"
+    }
+  ],
+  "sbg:categories": [
+    "Alignment",
+    "FASTQ-Processing"
+  ],
+  "sbg:toolkit": "BWA",
+  "sbg:job": {
+    "allocatedResources": {
+      "mem": 4096,
+      "cpu": 1
+    },
+    "inputs": {
+      "input_reads": [
+        {
+          "class": "File",
+          "secondaryFiles": [],
+          "path": "/path/to/LP6005524-DNA_C01_lane_7.sorted.converted.filtered.pe_1.gz",
+          "size": 30000000000,
+          "metadata": {
+            "platform": "HiSeq X Ten",
+            "paired_end": "2",
+            "sample_id": "dnk_sample"
+          }
+        },
+        {
+          "path": "/path/to/LP6005524-DNA_C01_lane_7.sorted.converted.filtered.pe_2.gz"
+        }
+      ],
+      "skip_seeds": null,
+      "rg_sample_id": "",
+      "sort_memory": null,
+      "read_group_header": "",
+      "threads": null,
+      "rg_library_id": "",
+      "band_width": null,
+      "mark_shorter": false,
+      "wgs_hg38_mode_threads": 10,
+      "split_alignment_primary": false,
+      "total_memory": null,
+      "rg_platform_unit_id": "",
+      "reserved_threads": null,
+      "rg_platform": null,
+      "output_format": "CRAM",
+      "filter_out_secondary_alignments": false,
+      "rg_data_submitting_center": "",
+      "mapQ_of_suplementary": false,
+      "num_input_bases_in_each_batch": null,
+      "rg_median_fragment_length": "",
+      "output_name": "",
+      "reference_index_tar": {
+        "class": "File",
+        "secondaryFiles": [
+          {
+            "path": ".amb"
+          },
+          {
+            "path": ".ann"
+          },
+          {
+            "path": ".bwt"
+          },
+          {
+            "path": ".pac"
+          },
+          {
+            "path": ".sa"
+          }
+        ],
+        "path": "/path/to/reference.HG38.fasta.gz.tar",
+        "size": 0
+      },
+      "rg_id": "",
+      "deduplication": "RemoveDuplicates"
+    }
+  },
+  "class": "CommandLineTool",
+  "description": "**BWA-MEM** is an algorithm designed for aligning sequence reads onto a large reference genome. BWA-MEM is implemented as a component of BWA. The algorithm can automatically choose between performing end-to-end and local alignments. BWA-MEM is capable of outputting multiple alignments, and finding chimeric reads. It can be applied to a wide range of read lengths, from 70 bp to several megabases. \n\n## Common Use Cases\nIn order to obtain possibilities for additional fast processing of aligned reads, **Biobambam2 sortmadup** (2.0.87) tool is embedded together into the same package with BWA-MEM (0.7.17).\nIf deduplication of alignments is needed, it can be done by setting the parameter 'Duplication'. Biobambam2 sortmadup will be used internally to perform this action.\n\nBesides the standard BWA-MEM SAM output file, BWA-MEM package has been extended to support additional output options enabled by Biobambam2 sortmadup: BAM file, Coordinate Sorted BAM along with accompanying .bai file, queryname sorted BAM and CRAM. Sorted BAM is the default output of BWA-MEM. Parameter responsible for output type selection is *Output format*. Passing data from BWA-MEM to Biobambam2 sortmadup tool has been done through the linux pipes which saves processing times (up to an hour of the execution time for whole genome sample) of two read and write of aligned reads into the hard drive.\n\n## Common Issues and Important Notes\nFor input reads fastq files of total size less than 10 GB we suggest using the default setting for parameter 'total memory' of 15GB, for larger files we suggest using 58 GB of memory and 32 CPU cores.\n\nIn order to work BWA-MEM Bundle requires fasta reference file accompanied with **BWA Fasta indices** in TAR file.\n\nHuman reference genome version 38 comes with ALT contigs, a collection of diverged alleles present in some humans but not the others. Making effective use of these contigs will help to reduce mapping artifacts, however, to facilitate mapping these ALT contigs to the primary assembly, GRC decided to add to each contig long flanking sequences almost identical to the primary assembly. As a result, a naive mapping against GRCh38+ALT will lead to many mapQ-zero mappings in these flanking regions. Please use post-processing steps to fix these alignments or implement [steps](https://sourceforge.net/p/bio-bwa/mailman/message/32845712/) described by the author of BWA toolkit.",
+  "sbg:projectName": "SBG Public Data",
+  "sbg:cmdPreview": "/bin/bash -c \" export REF_CACHE=${PWD} ;  tar -tvf reference.HG38.fasta.gz.tar 1>&2; tar -xf reference.HG38.fasta.gz.tar ;  bwa mem  -R '@RG\\tID:1\\tPL:Illumina\\tSM:dnk_sample' -t 10  reference.HG38.fasta.gz  /path/to/LP6005524-DNA_C01_lane_7.sorted.converted.filtered.pe_2.gz /path/to/LP6005524-DNA_C01_lane_7.sorted.converted.filtered.pe_1.gz  | bamsormadup threads=10 level=1 tmplevel=-1 inputformat=sam outputformat=cram SO=coordinate reference=reference.HG38.fasta.gz indexfilename=LP6005524-DNA_C01_lane_7.sorted.converted.filtered.cram.crai M=LP6005524-DNA_C01_lane_7.sorted.converted.filtered.sormadup_metrics.log > LP6005524-DNA_C01_lane_7.sorted.converted.filtered.cram  ;declare -i pipe_statuses=(\\${PIPESTATUS[*]});len=\\${#pipe_statuses[@]};declare -i tot=0;echo \\${pipe_statuses[*]};for (( i=0; i<\\${len}; i++ ));do if [ \\${pipe_statuses[\\$i]} -ne 0 ];then tot=\\${pipe_statuses[\\$i]}; fi;done;if [ \\$tot -ne 0 ]; then >&2 echo Error in piping. Pipe statuses: \\${pipe_statuses[*]};fi; if [ \\$tot -ne 0 ]; then false;fi\"",
+  "sbg:links": [
+    {
+      "id": "http://bio-bwa.sourceforge.net/",
+      "label": "Homepage"
+    },
+    {
+      "id": "https://github.com/lh3/bwa",
+      "label": "Source code"
+    },
+    {
+      "id": "http://bio-bwa.sourceforge.net/bwa.shtml",
+      "label": "Wiki"
+    },
+    {
+      "id": "http://sourceforge.net/projects/bio-bwa/",
+      "label": "Download"
+    },
+    {
+      "id": "http://arxiv.org/abs/1303.3997",
+      "label": "Publication"
+    },
+    {
+      "id": "http://www.ncbi.nlm.nih.gov/pubmed/19451168",
+      "label": "Publication BWA Algorithm"
+    }
+  ],
+  "sbg:appVersion": [
+    "sbg:draft-2"
+  ],
+  "id": "https://api.sbgenomics.com/v2/apps/admin/sbg-public-data/bwa-mem-bundle-0-7-17/36/raw/",
+  "sbg:id": "admin/sbg-public-data/bwa-mem-bundle-0-7-17/36",
+  "sbg:revision": 36,
+  "sbg:revisionNotes": "-q -5 boolean fix!",
+  "sbg:modifiedOn": 1556185548,
+  "sbg:modifiedBy": "admin",
+  "sbg:createdOn": 1532539861,
+  "sbg:createdBy": "admin",
+  "sbg:project": "admin/sbg-public-data",
+  "sbg:sbgMaintained": false,
+  "sbg:validationErrors": [],
+  "sbg:contributors": [
+    "admin"
+  ],
+  "sbg:latestRevision": 36,
+  "sbg:publisher": "sbg",
+  "sbg:content_hash": "a8a7843bc3f762e671b4c04e4b5112fdfca147bd9fc68c46f5b2fc9748e99bc80"
+}
