@@ -23,7 +23,7 @@ Useful links:
 Authors:
 \itemize{
   \item Soner Koc \email{soner.koc@sevenbridges.com}
-  \item Dennis Dean \email{dennis.dean@sevenbridges.com}
+  \item Dennis Dean \email{dennis.dean@sevenbridges.com} (0000-0002-7621-9717)
 }
 
 Other contributors:

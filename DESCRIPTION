@@ -6,7 +6,8 @@ Authors@R: c(
     person("Nan", "Xiao", email = "nan.xiao@sevenbridges.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0250-5673")),
     person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut")),
-    person("Dennis", "Dean", email = "dennis.dean@sevenbridges.com", role = c("aut")),
+    person("Dennis", "Dean", email = "dennis.dean@sevenbridges.com", role = c("aut"),
+           comment = c(ORCID = "0000-0002-7621-9717")),
     person("Seven Bridges Genomics", role = c("cph", "fnd"))
     )
 Maintainer: Nan Xiao <nan.xiao@sevenbridges.com>
