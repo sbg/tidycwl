@@ -27,17 +27,15 @@ It requires PhantomJS installed in your system.
 }
 \examples{
 if (interactive()) {
-
-file_png <- tempfile(fileext = ".png")
-flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
-get_graph(
-  flow \%>\% parse_inputs(),
-  flow \%>\% parse_outputs(),
-  flow \%>\% parse_steps()
-) \%>\%
-  visualize_graph() \%>\%
-  export_html(tempfile(fileext = ".html")) \%>\%
-  export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
-
+  file_png <- tempfile(fileext = ".png")
+  flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
+  get_graph(
+    flow \%>\% parse_inputs(),
+    flow \%>\% parse_outputs(),
+    flow \%>\% parse_steps()
+  ) \%>\%
+    visualize_graph() \%>\%
+    export_html(tempfile(fileext = ".html")) \%>\%
+    export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
 }
 }

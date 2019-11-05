@@ -20,13 +20,15 @@ HTML file path
 Export the workflow plot as HTML
 }
 \examples{
-file_html <- tempfile(fileext = ".html")
-flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
-get_graph(
-  flow \%>\% parse_inputs(),
-  flow \%>\% parse_outputs(),
-  flow \%>\% parse_steps()
-) \%>\%
-  visualize_graph() \%>\%
-  export_html(file_html)
+if (interactive()) {
+  file_html <- tempfile(fileext = ".html")
+  flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
+  get_graph(
+    flow \%>\% parse_inputs(),
+    flow \%>\% parse_outputs(),
+    flow \%>\% parse_steps()
+  ) \%>\%
+    visualize_graph() \%>\%
+    export_html(file_html)
+}
 }
