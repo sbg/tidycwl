@@ -20,11 +20,7 @@ HTML file path
 Export the workflow plot as HTML
 }
 \examples{
-\dontrun{
-
-library("tidycwl")
-library("magrittr")
-
+file_html <- tempfile(fileext = ".html")
 flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
 get_graph(
   flow \%>\% parse_inputs(),
@@ -32,6 +28,5 @@ get_graph(
   flow \%>\% parse_steps()
 ) \%>\%
   visualize_graph() \%>\%
-  export_html("gatk4-wgs.html")
-}
+  export_html(file_html)
 }

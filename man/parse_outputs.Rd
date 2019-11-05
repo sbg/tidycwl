@@ -12,15 +12,12 @@ parse_outputs(x, simplify = TRUE)
 \item{simplify}{Simplify the list as a data frame?}
 }
 \value{
-list or data frame of outputs
+List or data frame of outputs
 }
 \description{
 Parse the outputs of the CWL workflow into a data frame
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") \%>\%
   read_cwl_json() \%>\%
   parse_outputs() \%>\%

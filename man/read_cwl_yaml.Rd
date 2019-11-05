@@ -9,13 +9,13 @@ read_cwl_yaml(file)
 \arguments{
 \item{file}{A file path, YAML string, or connection.}
 }
+\value{
+List representation of the input CWL
+}
 \description{
 Read a CWL file (YAML format) into a list
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") \%>\%
   read_cwl_yaml()
 }

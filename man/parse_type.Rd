@@ -9,13 +9,13 @@ parse_type(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+CWL content type (Workflow or CommandLineTool)
+}
 \description{
-Parse CWL content type (Workflow or CommandLineTool)
+Parse CWL content type
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   parse_type()

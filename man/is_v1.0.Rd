@@ -9,13 +9,13 @@ is_v1.0(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+Logical. \code{TRUE} if it is a CWL v1.0 object, \code{FALSE} if not.
+}
 \description{
 Is this CWL v1.0?
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   is_v1.0()

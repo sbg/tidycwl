@@ -24,6 +24,9 @@ a string and have \code{"px"} appended.}
 \item{quoted}{Is \code{expr} a quoted expression (with \code{quote()})?
 This is useful if you want to save an expression in a variable.}
 }
+\value{
+An output or render function that enables the use of the widget within Shiny apps.
+}
 \description{
 Output and renderer functions for using tidycwl within Shiny apps and
 interactive R Markdown documents.
@@ -31,9 +34,6 @@ interactive R Markdown documents.
 \examples{
 \dontrun{
 if (interactive()) {
-
-library("shiny")
-library("tidycwl")
 
 cwl_folder <- system.file("cwl/sbg/workflow/", package = "tidycwl")
 file_all <- list.files(cwl_folder)

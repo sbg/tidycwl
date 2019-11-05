@@ -9,13 +9,14 @@ is_tool(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+Logical. \code{TRUE} if it is a CWL command line tool
+(instead of a workflow), \code{FALSE} if not.
+}
 \description{
 Is this a CWL command line tool?
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/tool/bwa-mem.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   is_tool()

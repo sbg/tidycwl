@@ -11,6 +11,9 @@
 
 \item{...}{Additional parameters for \code{\link{print}} (not used).}
 }
+\value{
+The input \code{cwl} object.
+}
 \description{
 Print a brief summary of the CWL object.
 }

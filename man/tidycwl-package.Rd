@@ -6,7 +6,13 @@
 \alias{tidycwl-package}
 \title{tidycwl: Tidy Common Workflow Language Tools and Workflows}
 \description{
-Read, parse, and render Common Workflow Language tools and workflows.
+Read, parse, and visualize Common Workflow Language tools and workflows.
+    The package takes the raw Common Workflow Language (CWL) workflows encoded
+    in JSON or YAML and turns the workflow elements into tidy data frames or lists.
+    A graph representation for the workflow can be constructed and visualized
+    with the parsed workflow inputs, outputs, and steps. Users can embed the
+    visualizations in their 'Shiny' applications, and export them
+    as HTML files or static images.
 }
 \seealso{
 Useful links:

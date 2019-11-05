@@ -14,6 +14,9 @@ Should end with \code{.png}, \code{.pdf}, or \code{.jpeg}.}
 
 \item{...}{Additional parameters for \code{\link[webshot]{webshot}}.}
 }
+\value{
+Image file path
+}
 \description{
 Export the workflow plot as PNG, JPEG, or PDF files
 }
@@ -23,11 +26,9 @@ a screenshot for the rendered HTML of the graph.
 It requires PhantomJS installed in your system.
 }
 \examples{
-\dontrun{
+if (interactive()) {
 
-library("tidycwl")
-library("magrittr")
-
+file_png <- tempfile(fileext = ".png")
 flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\% read_cwl_json()
 get_graph(
   flow \%>\% parse_inputs(),
@@ -36,6 +37,7 @@ get_graph(
 ) \%>\%
   visualize_graph() \%>\%
   export_html(tempfile(fileext = ".html")) \%>\%
-  export_image("gatk4-wgs.png", vwidth = 2000, vheight = 3000, selector = "div.vis-network")
+  export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
+
 }
 }

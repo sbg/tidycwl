@@ -10,15 +10,12 @@ parse_steps(x)
 \item{x}{CWL object}
 }
 \value{
-list or data frame of steps
+List or data frame of steps
 }
 \description{
 Parse the steps of the CWL workflow into a data frame
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 # steps represented by a dictionary
 system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") \%>\%
   read_cwl_json() \%>\%

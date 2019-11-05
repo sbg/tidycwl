@@ -9,13 +9,13 @@ parse_meta(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+List of CWL metadata
+}
 \description{
 Parse the metadata in the CWL workflow
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   parse_meta()

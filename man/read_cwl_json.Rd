@@ -9,13 +9,13 @@ read_cwl_json(file)
 \arguments{
 \item{file}{A file path, JSON string, or connection.}
 }
+\value{
+List representation of the input CWL
+}
 \description{
 Read a CWL file (JSON format) into a list
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") \%>\%
   read_cwl_json()
 }

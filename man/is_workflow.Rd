@@ -9,13 +9,14 @@ is_workflow(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+Logical. \code{TRUE} if it is a CWL workflow
+(instead of a command line tool), \code{FALSE} if not.
+}
 \description{
 Is this a CWL workflow?
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   is_workflow()

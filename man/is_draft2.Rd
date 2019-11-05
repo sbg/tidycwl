@@ -9,13 +9,13 @@ is_draft2(x)
 \arguments{
 \item{x}{CWL object}
 }
+\value{
+Logical. \code{TRUE} if it is a CWL draft2 object, \code{FALSE} if not.
+}
 \description{
 Is this CWL draft2?
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") \%>\%
   read_cwl(format = "json") \%>\%
   is_draft2()

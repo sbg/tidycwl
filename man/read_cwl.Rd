@@ -11,13 +11,13 @@ read_cwl(file, format = c("json", "yaml"))
 
 \item{format}{CWL storage format. \code{"json"} or \code{"yaml"}.}
 }
+\value{
+List representation of the input CWL
+}
 \description{
 Read a CWL file into a list
 }
 \examples{
-library("tidycwl")
-library("magrittr")
-
 system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") \%>\%
   read_cwl(format = "json")
 
