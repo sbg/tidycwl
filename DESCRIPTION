@@ -1,7 +1,7 @@
 Package: tidycwl
 Type: Package
 Title: Tidy Common Workflow Language Tools and Workflows
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: c(
     person("Nan", "Xiao", email = "nan.xiao@sevenbridges.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0250-5673")),
@@ -11,7 +11,13 @@ Authors@R: c(
     person("Seven Bridges Genomics", role = c("cph", "fnd"))
     )
 Maintainer: Nan Xiao <nan.xiao@sevenbridges.com>
-Description: Read, parse, and render Common Workflow Language tools and workflows.
+Description: Read, parse, and visualize Common Workflow Language tools and workflows.
+    The package takes the raw Common Workflow Language (CWL) workflows encoded
+    in JSON or YAML and turns the workflow elements into tidy data frames or lists.
+    A graph representation for the workflow can be constructed and visualized
+    with the parsed workflow inputs, outputs, and steps. Users can embed the
+    visualizations in their 'Shiny' applications, and export them
+    as HTML files or static images.
 License: AGPL-3 | file LICENSE
 VignetteBuilder: knitr
 URL: https://sbg.github.io/tidycwl/, https://github.com/sbg/tidycwl
