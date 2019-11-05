@@ -82,7 +82,7 @@ inputs, outputs, and steps in a list." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tidycwl</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.1</span>
       </span>
     </div>
 
@@ -145,12 +145,12 @@ inputs, outputs, and steps in a list.</p>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>List of CWL metadata, inputs, outputs, and steps</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"tidycwl"</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='st'>"magrittr"</span>)
-
-<span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"cwl/sbg/workflow/rnaseq-salmon.cwl"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"tidycwl"</span>) <span class='kw'>%&gt;%</span>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"cwl/sbg/workflow/rnaseq-salmon.cwl"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"tidycwl"</span>) <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='read_cwl_yaml.html'>read_cwl_yaml</a></span>() <span class='kw'>%&gt;%</span>
   <span class='fu'>parse_cwl</span>() <span class='kw'>%&gt;%</span>
   <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>()</div><div class='output co'>#&gt; [1] "meta"    "steps"   "inputs"  "outputs"</div></pre>
@@ -159,6 +159,7 @@ inputs, outputs, and steps in a list.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
+      <li><a href="#value">Value</a></li>
       <li><a href="#examples">Examples</a></li>
     </ul>
 
