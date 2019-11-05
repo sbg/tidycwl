@@ -163,18 +163,16 @@ It requires PhantomJS installed in your system.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='kw'>if</span> (<span class='fu'><a href='https://rdrr.io/r/base/interactive.html'>interactive</a></span>()) {
-
-<span class='no'>file_png</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='kw'>fileext</span> <span class='kw'>=</span> <span class='st'>".png"</span>)
-<span class='no'>flow</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"cwl/sbg/workflow/gatk4-wgs.json"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"tidycwl"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='read_cwl_json.html'>read_cwl_json</a></span>()
-<span class='fu'><a href='get_graph.html'>get_graph</a></span>(
-  <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_inputs.html'>parse_inputs</a></span>(),
-  <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_outputs.html'>parse_outputs</a></span>(),
-  <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_steps.html'>parse_steps</a></span>()
-) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='visualize_graph.html'>visualize_graph</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='export_html.html'>export_html</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='kw'>fileext</span> <span class='kw'>=</span> <span class='st'>".html"</span>)) <span class='kw'>%&gt;%</span>
-  <span class='fu'>export_image</span>(<span class='no'>file_png</span>, <span class='kw'>vwidth</span> <span class='kw'>=</span> <span class='fl'>2000</span>, <span class='kw'>vheight</span> <span class='kw'>=</span> <span class='fl'>3000</span>, <span class='kw'>selector</span> <span class='kw'>=</span> <span class='st'>"div.vis-network"</span>)
-
+  <span class='no'>file_png</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='kw'>fileext</span> <span class='kw'>=</span> <span class='st'>".png"</span>)
+  <span class='no'>flow</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"cwl/sbg/workflow/gatk4-wgs.json"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"tidycwl"</span>) <span class='kw'>%&gt;%</span> <span class='fu'><a href='read_cwl_json.html'>read_cwl_json</a></span>()
+  <span class='fu'><a href='get_graph.html'>get_graph</a></span>(
+    <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_inputs.html'>parse_inputs</a></span>(),
+    <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_outputs.html'>parse_outputs</a></span>(),
+    <span class='no'>flow</span> <span class='kw'>%&gt;%</span> <span class='fu'><a href='parse_steps.html'>parse_steps</a></span>()
+  ) <span class='kw'>%&gt;%</span>
+    <span class='fu'><a href='visualize_graph.html'>visualize_graph</a></span>() <span class='kw'>%&gt;%</span>
+    <span class='fu'><a href='export_html.html'>export_html</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/tempfile.html'>tempfile</a></span>(<span class='kw'>fileext</span> <span class='kw'>=</span> <span class='st'>".html"</span>)) <span class='kw'>%&gt;%</span>
+    <span class='fu'>export_image</span>(<span class='no'>file_png</span>, <span class='kw'>vwidth</span> <span class='kw'>=</span> <span class='fl'>2000</span>, <span class='kw'>vheight</span> <span class='kw'>=</span> <span class='fl'>3000</span>, <span class='kw'>selector</span> <span class='kw'>=</span> <span class='st'>"div.vis-network"</span>)
 }</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
