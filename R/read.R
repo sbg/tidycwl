@@ -2,14 +2,13 @@
 #'
 #' @param file A file path, JSON string, or connection.
 #'
+#' @return List representation of the input CWL
+#'
 #' @importFrom jsonlite fromJSON
 #'
 #' @export read_cwl_json
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json()
 read_cwl_json <- function(file) {
@@ -22,12 +21,11 @@ read_cwl_json <- function(file) {
 #'
 #' @param file A file path, YAML string, or connection.
 #'
+#' @return List representation of the input CWL
+#'
 #' @export read_cwl_yaml
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>%
 #'   read_cwl_yaml()
 read_cwl_yaml <- function(file) {
@@ -41,12 +39,11 @@ read_cwl_yaml <- function(file) {
 #' @param file A file path, character string, or connection.
 #' @param format CWL storage format. \code{"json"} or \code{"yaml"}.
 #'
+#' @return List representation of the input CWL
+#'
 #' @export read_cwl
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json")
 #'

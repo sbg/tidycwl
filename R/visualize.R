@@ -13,15 +13,13 @@
 #' @param height Canvas height, see \code{\link[visNetwork]{visNetwork}}.
 #' Default is \code{600}.
 #'
+#' @return A \code{\link[visNetwork]{visNetwork}} output.
+#'
 #' @importFrom visNetwork visNetwork visNodes visEdges visGroups visHierarchicalLayout
-#' @importFrom magrittr %>%
 #'
 #' @export visualize_graph
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
 #' get_graph(
 #'   flow %>% parse_inputs(),

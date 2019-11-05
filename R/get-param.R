@@ -2,12 +2,11 @@
 #'
 #' @param x CWL object
 #'
+#' @return CWL version number
+#'
 #' @export get_cwl_version
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
 #'   get_cwl_version()
@@ -25,12 +24,11 @@ get_cwl_version <- function(x) x$cwlVersion
 #'
 #' @param inputs Parsed inputs
 #'
+#' @return Vector of input IDs
+#'
 #' @export get_inputs_id
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # inputs represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -58,12 +56,11 @@ get_inputs_id <- function(inputs) {
 #'
 #' @param inputs Parsed inputs
 #'
+#' @return Vector of input labels
+#'
 #' @export get_inputs_label
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # inputs represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -91,12 +88,11 @@ get_inputs_label <- function(inputs) {
 #'
 #' @param outputs Parsed outputs
 #'
+#' @return Vector of output IDs
+#'
 #' @export get_outputs_id
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # inputs represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -124,12 +120,11 @@ get_outputs_id <- function(outputs) {
 #'
 #' @param outputs Parsed outputs
 #'
+#' @return Vector of output labels
+#'
 #' @export get_outputs_label
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # inputs represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -157,12 +152,11 @@ get_outputs_label <- function(outputs) {
 #'
 #' @param steps Steps object parsed by \code{\link{parse_steps}}
 #'
+#' @return Vector of step IDs
+#'
 #' @export get_steps_id
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -190,12 +184,11 @@ get_steps_id <- function(steps) {
 #'
 #' @param steps Steps object parsed by \code{\link{parse_steps}}
 #'
+#' @return Vector of step labels
+#'
 #' @export get_steps_label
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -234,12 +227,11 @@ get_steps_label <- function(steps) {
 #'
 #' @param steps Steps object parsed by \code{\link{parse_steps}}
 #'
+#' @return Vector of step documentation/descriptions
+#'
 #' @export get_steps_doc
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -288,12 +280,11 @@ get_steps_doc <- function(steps) {
 #'
 #' @param steps Steps object parsed by \code{\link{parse_steps}}
 #'
+#' @return Vector of step toolkit versions
+#'
 #' @export get_steps_version
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -332,12 +323,11 @@ get_steps_version <- function(steps) {
 #'
 #' @param steps Steps object parsed by \code{\link{parse_steps}}
 #'
+#' @return Vector of step revision numbers
+#'
 #' @export get_steps_revision
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%

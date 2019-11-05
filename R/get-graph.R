@@ -4,12 +4,11 @@
 #' @param outputs Parsed outputs
 #' @param steps Parsed steps
 #'
+#' @return Data frame containing node information
+#'
 #' @export get_nodes
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
 #' get_nodes(
 #'   flow %>% parse_inputs(),
@@ -64,12 +63,11 @@ get_nodes <- function(inputs, outputs, steps) {
 #' @param outputs Parsed outputs
 #' @param steps Parsed steps
 #'
+#' @return Data frame containing edge information
+#'
 #' @export get_edges
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # edges represented by a dictionary
 #' flow <- system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>% read_cwl_json()
 #' get_edges(
@@ -132,12 +130,11 @@ get_edges <- function(outputs, steps) {
 #' @param outputs Parsed outputs
 #' @param steps Parsed steps
 #'
+#' @return List of two data frames containing node and edge information
+#'
 #' @export get_graph
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # sbg:draft2
 #' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
 #' get_graph(

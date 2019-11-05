@@ -5,6 +5,8 @@
 #' @param x An object of class \code{cwl}.
 #' @param ... Additional parameters for \code{\link{print}} (not used).
 #'
+#' @return The input \code{cwl} object.
+#'
 #' @method print cwl
 #'
 #' @export
@@ -18,4 +20,5 @@ print.cwl <- function(x, ...) {
   cat("Name:", x$label, "\n")
   cat("Class:", x$class, "\n")
   cat("CWL Version:", x$cwlVersion, "\n")
+  invisible(x)
 }

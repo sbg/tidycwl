@@ -12,6 +12,8 @@
 #' @param quoted Is \code{expr} a quoted expression (with \code{quote()})?
 #' This is useful if you want to save an expression in a variable.
 #'
+#' @return An output or render function that enables the use of the widget within Shiny apps.
+#'
 #' @importFrom visNetwork visNetworkOutput renderVisNetwork
 #' @importFrom htmlwidgets shinyRenderWidget shinyWidgetOutput
 #'
@@ -20,9 +22,6 @@
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
-#'
-#' library("shiny")
-#' library("tidycwl")
 #'
 #' cwl_folder <- system.file("cwl/sbg/workflow/", package = "tidycwl")
 #' file_all <- list.files(cwl_folder)

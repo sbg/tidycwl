@@ -4,18 +4,14 @@
 #' @param file File to save HTML into.
 #' @param ... Additional parameters for \code{\link[visNetwork]{visSave}}.
 #'
-#' @export export_html
-#'
 #' @return HTML file path
+#'
+#' @export export_html
 #'
 #' @importFrom visNetwork visSave
 #'
 #' @examples
-#' \dontrun{
-#'
-#' library("tidycwl")
-#' library("magrittr")
-#'
+#' file_html <- tempfile(fileext = ".html")
 #' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
 #' get_graph(
 #'   flow %>% parse_inputs(),
@@ -23,8 +19,7 @@
 #'   flow %>% parse_steps()
 #' ) %>%
 #'   visualize_graph() %>%
-#'   export_html("gatk4-wgs.html")
-#' }
+#'   export_html(file_html)
 export_html <- function(g, file, ...) {
   visSave(g, file, ...)
   invisible(file)
@@ -37,6 +32,8 @@ export_html <- function(g, file, ...) {
 #' Should end with \code{.png}, \code{.pdf}, or \code{.jpeg}.
 #' @param ... Additional parameters for \code{\link[webshot]{webshot}}.
 #'
+#' @return Image file path
+#'
 #' @export export_image
 #'
 #' @importFrom webshot webshot
@@ -46,11 +43,9 @@ export_html <- function(g, file, ...) {
 #' It requires PhantomJS installed in your system.
 #'
 #' @examples
-#' \dontrun{
+#' if (interactive()) {
 #'
-#' library("tidycwl")
-#' library("magrittr")
-#'
+#' file_png <- tempfile(fileext = ".png")
 #' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
 #' get_graph(
 #'   flow %>% parse_inputs(),
@@ -59,10 +54,11 @@ export_html <- function(g, file, ...) {
 #' ) %>%
 #'   visualize_graph() %>%
 #'   export_html(tempfile(fileext = ".html")) %>%
-#'   export_image("gatk4-wgs.png", vwidth = 2000, vheight = 3000, selector = "div.vis-network")
+#'   export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
+#'
 #' }
 export_image <- function(file_html, file_image, ...) {
-  # TODO: needs cross-platform testing
+  # TODO: needs more comprehensive cross-platform testing
   file_url <- paste0("file://", normalizePath(file_html))
   webshot(url = file_url, file = file_image, ...)
   invisible(file_image)

@@ -2,12 +2,11 @@
 #'
 #' @param x any object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL object, \code{FALSE} if not.
+#'
 #' @export is_cwl
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_cwl()
@@ -17,12 +16,11 @@ is_cwl <- function(x) if ("cwl" %in% class(x)) TRUE else FALSE
 #'
 #' @param x CWL object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL draft2 object, \code{FALSE} if not.
+#'
 #' @export is_draft2
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_draft2()
@@ -36,12 +34,11 @@ is_draft2 <- function(x) get_cwl_version(x) == "sbg:draft-2"
 #'
 #' @param x CWL object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL v1.0 object, \code{FALSE} if not.
+#'
 #' @export is_v1.0
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_v1.0()
@@ -55,12 +52,11 @@ is_v1.0 <- function(x) get_cwl_version(x) == "v1.0"
 #'
 #' @param x CWL object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL v1.1 object, \code{FALSE} if not.
+#'
 #' @export is_v1.1
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_v1.1()
@@ -70,12 +66,12 @@ is_v1.1 <- function(x) get_cwl_version(x) == "v1.1"
 #'
 #' @param x CWL object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL workflow
+#' (instead of a command line tool), \code{FALSE} if not.
+#'
 #' @export is_workflow
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_workflow()
@@ -89,12 +85,12 @@ is_workflow <- function(x) if (tolower(parse_type(x)) == "workflow") TRUE else F
 #'
 #' @param x CWL object
 #'
+#' @return Logical. \code{TRUE} if it is a CWL command line tool
+#' (instead of a workflow), \code{FALSE} if not.
+#'
 #' @export is_tool
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/tool/bwa-mem.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_tool()

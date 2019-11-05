@@ -1,15 +1,12 @@
 #' Parse CWL content type
 #'
-#' Parse CWL content type (Workflow or CommandLineTool)
-#'
 #' @param x CWL object
+#'
+#' @return CWL content type (Workflow or CommandLineTool)
 #'
 #' @export parse_type
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   parse_type()
@@ -26,12 +23,11 @@ parse_type <- function(x) {
 #'
 #' @param x CWL object
 #'
+#' @return List of CWL metadata
+#'
 #' @export parse_meta
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   parse_meta()
@@ -53,16 +49,13 @@ parse_meta <- function(x) {
 #' @param x CWL object
 #' @param simplify Simplify the list as a data frame?
 #'
+#' @return List or data frame of inputs
+#'
 #' @importFrom dplyr bind_rows
 #'
 #' @export parse_inputs
 #'
-#' @return list or data frame of inputs
-#'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
 #'   parse_inputs() %>%
@@ -98,16 +91,13 @@ parse_inputs <- function(x, simplify = TRUE) {
 #' @param x CWL object
 #' @param simplify Simplify the list as a data frame?
 #'
+#' @return List or data frame of outputs
+#'
 #' @importFrom dplyr bind_rows
 #'
 #' @export parse_outputs
 #'
-#' @return list or data frame of outputs
-#'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
 #'   parse_outputs() %>%
@@ -142,14 +132,11 @@ parse_outputs <- function(x, simplify = TRUE) {
 #'
 #' @param x CWL object
 #'
+#' @return List or data frame of steps
+#'
 #' @export parse_steps
 #'
-#' @return list or data frame of steps
-#'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' # steps represented by a dictionary
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
 #'   read_cwl_json() %>%
@@ -178,12 +165,11 @@ parse_steps <- function(x) {
 #'
 #' @param x CWL object
 #'
+#' @return List of CWL metadata, inputs, outputs, and steps
+#'
 #' @export parse_cwl
 #'
 #' @examples
-#' library("tidycwl")
-#' library("magrittr")
-#'
 #' system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>%
 #'   read_cwl_yaml() %>%
 #'   parse_cwl() %>%
