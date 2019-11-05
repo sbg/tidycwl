@@ -27,7 +27,6 @@ Let's use a real-world example to see how we can read, parse, and visualize a bi
 
 ```{r}
 library("tidycwl")
-library("magrittr")
 ```
 
 # Read workflow
