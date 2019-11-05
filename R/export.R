@@ -11,15 +11,17 @@
 #' @importFrom visNetwork visSave
 #'
 #' @examples
-#' file_html <- tempfile(fileext = ".html")
-#' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
-#' get_graph(
-#'   flow %>% parse_inputs(),
-#'   flow %>% parse_outputs(),
-#'   flow %>% parse_steps()
-#' ) %>%
-#'   visualize_graph() %>%
-#'   export_html(file_html)
+#' if (interactive()) {
+#'   file_html <- tempfile(fileext = ".html")
+#'   flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
+#'   get_graph(
+#'     flow %>% parse_inputs(),
+#'     flow %>% parse_outputs(),
+#'     flow %>% parse_steps()
+#'   ) %>%
+#'     visualize_graph() %>%
+#'     export_html(file_html)
+#' }
 export_html <- function(g, file, ...) {
   visSave(g, file, ...)
   invisible(file)
@@ -44,18 +46,16 @@ export_html <- function(g, file, ...) {
 #'
 #' @examples
 #' if (interactive()) {
-#'
-#' file_png <- tempfile(fileext = ".png")
-#' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
-#' get_graph(
-#'   flow %>% parse_inputs(),
-#'   flow %>% parse_outputs(),
-#'   flow %>% parse_steps()
-#' ) %>%
-#'   visualize_graph() %>%
-#'   export_html(tempfile(fileext = ".html")) %>%
-#'   export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
-#'
+#'   file_png <- tempfile(fileext = ".png")
+#'   flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
+#'   get_graph(
+#'     flow %>% parse_inputs(),
+#'     flow %>% parse_outputs(),
+#'     flow %>% parse_steps()
+#'   ) %>%
+#'     visualize_graph() %>%
+#'     export_html(tempfile(fileext = ".html")) %>%
+#'     export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
 #' }
 export_image <- function(file_html, file_image, ...) {
   # TODO: needs more comprehensive cross-platform testing
