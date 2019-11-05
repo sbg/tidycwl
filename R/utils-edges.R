@@ -81,7 +81,6 @@ read_edges_steps <- function(steps_in, steps, cwl_version) {
 
   for (i in 1:length(steps_id)) {
     for (j in 1:nrow(steps_in[[i]])) {
-
       key <- steps_in[[i]][j, "id"]
       key_vec <- strsplit(key, sep)[[1]]
 

@@ -127,20 +127,24 @@ remove_from_df <- function(df, var) {
 
 # remove unused data and things that caused list to data frame
 # conversion issues in inputs list
-sanitize_inputs_list <- function(inputs)
+sanitize_inputs_list <- function(inputs) {
   remove_from_list(inputs, .inputs_to_remove)
+}
 
 # remove unused data in inputs data frame
-sanitize_inputs_df <- function(inputs)
+sanitize_inputs_df <- function(inputs) {
   remove_from_df(inputs, .inputs_to_remove)
+}
 
 # remove unused data in outputs list
-sanitize_outputs_list <- function(outputs)
+sanitize_outputs_list <- function(outputs) {
   remove_from_list(outputs, .outputs_to_remove)
+}
 
 # remove unused data in outputs data frame
-sanitize_outputs_df <- function(outputs)
+sanitize_outputs_df <- function(outputs) {
   remove_from_df(outputs, .outputs_to_remove)
+}
 
 # convert list to data frame
 list2df <- function(lst) as.data.frame(dplyr::bind_rows(lst))

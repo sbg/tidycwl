@@ -22,29 +22,27 @@
 #' @examples
 #' \dontrun{
 #' if (interactive()) {
+#'   cwl_folder <- system.file("cwl/sbg/workflow/", package = "tidycwl")
+#'   file_all <- list.files(cwl_folder)
+#'   cwl_name <- file_all[which(tools::file_ext(file_all) == "json")]
 #'
-#' cwl_folder <- system.file("cwl/sbg/workflow/", package = "tidycwl")
-#' file_all <- list.files(cwl_folder)
-#' cwl_name <- file_all[which(tools::file_ext(file_all) == "json")]
+#'   ui <- fluidPage(
+#'     selectInput("cwl_file", "Select a CWL file:", cwl_name),
+#'     cwl_output("cwl_plot", height = "800px")
+#'   )
 #'
-#' ui <- fluidPage(
-#'   selectInput("cwl_file", "Select a CWL file:", cwl_name),
-#'   cwl_output("cwl_plot", height = "800px")
-#' )
+#'   server <- function(input, output, session) {
+#'     output$cwl_plot <- render_cwl({
+#'       flow <- paste0(cwl_folder, input$cwl_file) %>% read_cwl_json()
+#'       get_graph(
+#'         flow %>% parse_inputs(),
+#'         flow %>% parse_outputs(),
+#'         flow %>% parse_steps()
+#'       ) %>% visualize_graph()
+#'     })
+#'   }
 #'
-#' server <- function(input, output, session) {
-#'   output$cwl_plot <- render_cwl({
-#'     flow <- paste0(cwl_folder, input$cwl_file) %>% read_cwl_json()
-#'     get_graph(
-#'       flow %>% parse_inputs(),
-#'       flow %>% parse_outputs(),
-#'       flow %>% parse_steps()
-#'     ) %>% visualize_graph()
-#'   })
-#' }
-#'
-#' shinyApp(ui, server)
-#'
+#'   shinyApp(ui, server)
 #' }
 #' }
 #'
