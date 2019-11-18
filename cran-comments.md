@@ -1,3 +1,27 @@
+# tidycwl 1.0.2
+
+## Test environments
+
+- Local macOS install, R 3.6.1
+- Ubuntu 16.04.6 LTS (on Travis-CI), R 3.6.1
+- win-builder (release, devel, and oldrelease)
+
+## R CMD check results
+
+There were no ERRORs or WARNINGs.
+
+## Single quotes
+
+Added single quotes for package names, software names, and API names to the Title and Description section as suggested, for example, 'YAML' and 'Common Workflow Language'.
+
+## if(interactive()){} statement
+
+Removed the `if(interactive()){}` statement from the example in export_html.Rd since it was unnecessary.
+
+## System requirements
+
+Added PhantomJS to the SystemRequirements field since it is an essential system dependency to run export_image() and the example code in export_image.Rd.
+
 # tidycwl 1.0.1
 
 ## Test environments
