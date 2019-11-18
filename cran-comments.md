@@ -12,7 +12,7 @@ There were no ERRORs or WARNINGs.
 
 ## Single quotes
 
-Added single quotes for package names, software names, and API names to the Title and Description section as suggested, for example, 'YAML' and 'Common Workflow Language'.
+Added single quotes for package names, software names, and API names to the Title and Description section as suggested.
 
 ## if(interactive()){} statement
 
