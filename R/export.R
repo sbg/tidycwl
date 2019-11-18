@@ -58,7 +58,6 @@ export_html <- function(g, file, ...) {
 #'     export_image(file_png, vwidth = 2000, vheight = 3000, selector = "div.vis-network")
 #' }
 export_image <- function(file_html, file_image, ...) {
-  # TODO: needs more comprehensive cross-platform testing
   file_url <- paste0("file://", normalizePath(file_html))
   webshot(url = file_url, file = file_image, ...)
   invisible(file_image)

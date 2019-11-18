@@ -32,8 +32,10 @@ Output and renderer functions for using tidycwl within Shiny apps and
 interactive R Markdown documents.
 }
 \examples{
-\dontrun{
 if (interactive()) {
+  library("shiny")
+  library("tidycwl")
+
   cwl_folder <- system.file("cwl/sbg/workflow/", package = "tidycwl")
   file_all <- list.files(cwl_folder)
   cwl_name <- file_all[which(tools::file_ext(file_all) == "json")]
@@ -56,6 +58,4 @@ if (interactive()) {
 
   shinyApp(ui, server)
 }
-}
-
 }

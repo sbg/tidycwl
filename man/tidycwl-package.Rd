@@ -4,15 +4,16 @@
 \name{tidycwl-package}
 \alias{tidycwl}
 \alias{tidycwl-package}
-\title{tidycwl: Tidy Common Workflow Language Tools and Workflows}
+\title{tidycwl: Tidy 'Common Workflow Language' Workflows}
 \description{
-Read, parse, and visualize Common Workflow Language tools and workflows.
-    The package takes the raw Common Workflow Language (CWL) workflows encoded
-    in JSON or YAML and turns the workflow elements into tidy data frames or lists.
+The 'Common Workflow Language' <https://www.commonwl.org/> is an
+    open standard for describing data analysis workflows. This package takes
+    the raw 'Common Workflow Language' workflows encoded in 'JSON' or 'YAML'
+    and turns the workflow elements into tidy data frames or lists.
     A graph representation for the workflow can be constructed and visualized
     with the parsed workflow inputs, outputs, and steps. Users can embed the
     visualizations in their 'Shiny' applications, and export them
-    as HTML files or static images.
+    as 'HTML' files or static images.
 }
 \seealso{
 Useful links:
@@ -24,12 +25,12 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Nan Xiao \email{nan.xiao@sevenbridges.com} (0000-0002-0250-5673)
+\strong{Maintainer}: Nan Xiao \email{nan.xiao@sevenbridges.com} (\href{https://orcid.org/0000-0002-0250-5673}{ORCID})
 
 Authors:
 \itemize{
   \item Soner Koc \email{soner.koc@sevenbridges.com}
-  \item Dennis Dean \email{dennis.dean@sevenbridges.com} (0000-0002-7621-9717)
+  \item Dennis Dean \email{dennis.dean@sevenbridges.com} (\href{https://orcid.org/0000-0002-7621-9717}{ORCID})
 }
 
 Other contributors:
