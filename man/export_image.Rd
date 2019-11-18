@@ -24,6 +24,7 @@ Export the workflow plot as PNG, JPEG, or PDF files
 This function uses \code{\link[webshot]{webshot}} to take
 a screenshot for the rendered HTML of the graph.
 It requires PhantomJS installed in your system.
+You can use \code{\link[webshot]{install_phantomjs}} to install it.
 }
 \examples{
 if (interactive()) {

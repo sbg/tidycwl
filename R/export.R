@@ -11,17 +11,15 @@
 #' @importFrom visNetwork visSave
 #'
 #' @examples
-#' if (interactive()) {
-#'   file_html <- tempfile(fileext = ".html")
-#'   flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
-#'   get_graph(
-#'     flow %>% parse_inputs(),
-#'     flow %>% parse_outputs(),
-#'     flow %>% parse_steps()
-#'   ) %>%
-#'     visualize_graph() %>%
-#'     export_html(file_html)
-#' }
+#' file_html <- tempfile(fileext = ".html")
+#' flow <- system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>% read_cwl_json()
+#' get_graph(
+#'   flow %>% parse_inputs(),
+#'   flow %>% parse_outputs(),
+#'   flow %>% parse_steps()
+#' ) %>%
+#'   visualize_graph() %>%
+#'   export_html(file_html)
 export_html <- function(g, file, ...) {
   visSave(g, file, ...)
   invisible(file)
@@ -43,6 +41,7 @@ export_html <- function(g, file, ...) {
 #' @note This function uses \code{\link[webshot]{webshot}} to take
 #' a screenshot for the rendered HTML of the graph.
 #' It requires PhantomJS installed in your system.
+#' You can use \code{\link[webshot]{install_phantomjs}} to install it.
 #'
 #' @examples
 #' if (interactive()) {
