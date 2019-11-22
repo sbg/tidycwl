@@ -1,7 +1,7 @@
 Package: tidycwl
 Type: Package
 Title: Tidy Common Workflow Language Tools and Workflows
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person("Nan", "Xiao", email = "nan.xiao@sevenbridges.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0250-5673")),
@@ -19,7 +19,7 @@ Description: The Common Workflow Language <https://www.commonwl.org/> is an
     with the parsed workflow inputs, outputs, and steps. Users can embed the
     visualizations in their 'Shiny' applications, and export them
     as HTML files or static images.
-License: AGPL-3 | file LICENSE
+License: AGPL-3
 SystemRequirements: PhantomJS (https://phantomjs.org).
 VignetteBuilder: knitr
 URL: https://sbg.github.io/tidycwl/, https://github.com/sbg/tidycwl
