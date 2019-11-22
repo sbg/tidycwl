@@ -1,3 +1,19 @@
+# tidycwl 1.0.3
+
+## Test environments
+
+- Local macOS install, R 3.6.1
+- Ubuntu 16.04.6 LTS (on Travis-CI), R 3.6.1
+- win-builder (release, devel, and oldrelease)
+
+## R CMD check results
+
+There were no ERRORs or WARNINGs.
+
+## License file
+
+Removed the redundant copy of the full AGPL-3 license file as requested.
+
 # tidycwl 1.0.2
 
 ## Test environments
