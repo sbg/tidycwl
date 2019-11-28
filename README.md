@@ -2,6 +2,7 @@
 
 [![Travis build status](https://travis-ci.org/sbg/tidycwl.svg?branch=master)](https://travis-ci.org/sbg/tidycwl)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/dp3rsacx9m10x6ei/branch/master?svg=true)](https://ci.appveyor.com/project/nanxstats/tidycwl)
+[![CRAN Version](https://www.r-pkg.org/badges/version/tidycwl)](https://cran.r-project.org/package=tidycwl)
 
 Read, parse, and visualize Common Workflow Language (CWL) workflows.
 
