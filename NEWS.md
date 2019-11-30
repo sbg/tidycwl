@@ -1,3 +1,10 @@
+# tidycwl 1.0.4
+
+## Improvements
+
+- Run example code conditionally which requires pandoc to support CRAN's Solaris environment.
+- Added pandoc to the SystemRequirements field.
+
 # tidycwl 1.0.3
 
 ## Improvements

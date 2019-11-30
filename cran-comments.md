@@ -1,3 +1,19 @@
+# tidycwl 1.0.4
+
+## Test environments
+
+- Local macOS install, R 3.6.1
+- Ubuntu 16.04.6 LTS (on Travis-CI), R 3.6.1
+- win-builder (release, devel, and oldrelease)
+
+## R CMD check results
+
+There were no ERRORs or WARNINGs.
+
+## Solaris check fix
+
+Run example code conditionally which requires pandoc to support CRAN's Solaris environment. Added pandoc to the SystemRequirements field.
+
 # tidycwl 1.0.3
 
 ## Test environments
