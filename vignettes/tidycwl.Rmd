@@ -89,14 +89,16 @@ get_graph(
 
 # Visualize workflow
 
-With tidycwl, we can visualize the workflow graph by calling `visualize_graph()`, which is built on the `visNetwork` package with an automatic hierarchical layout.:
+With tidycwl, we can visualize the workflow graph by calling `visualize_graph()`, which is built on the `visNetwork` package with an automatic hierarchical layout:
 
-```{r}
-get_graph(
-  flow %>% parse_inputs(),
-  flow %>% parse_outputs(),
-  flow %>% parse_steps()
-) %>% visualize_graph()
+```{r, screenshot.force=FALSE}
+if (rmarkdown::pandoc_available("1.12.3")) {
+  get_graph(
+    flow %>% parse_inputs(),
+    flow %>% parse_outputs(),
+    flow %>% parse_steps()
+  ) %>% visualize_graph()
+}
 ```
 
 Users can interact with the visualization by zooming in/out and dragging the view or nodes. The graphical details can be further fine-tuned by feeding additional parameters to `visualize_graph()`.
