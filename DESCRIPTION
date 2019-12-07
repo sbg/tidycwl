@@ -38,4 +38,4 @@ Suggests:
     knitr,
     rmarkdown,
     shiny
-RoxygenNote: 7.0.1
+RoxygenNote: 7.0.2
