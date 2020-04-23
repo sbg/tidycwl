@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,7 +43,6 @@
 
 <meta property="og:title" content="Get documentation/description for steps — get_steps_doc" />
 <meta property="og:description" content="Get documentation/description for steps" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -67,7 +70,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -105,7 +108,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/sbg/tidycwl">
+  <a href="https://github.com/sbg/tidycwl/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -167,14 +170,10 @@
 #&gt; [4] "**Salmon Index** tool builds an index from a transcriptome FASTA formatted file of target sequences, necessary for the **Salmon Quant** tool.  \n\n**Quasi-mapping** is a process of assigning reads to transcripts, without doing the exact base-to-base alignment. Seeing that for estimating transcript abundances, the main information needed is which transcript a read originates from and not the actual mapping coordinates, the idea with the **Salmon** tool was to implement a procedure that does exactly that [1, 2]. \n\nThe result is a software running at speeds orders of magnitude faster than other tools which utilize the full likelihood model, while keeping near-optimal probabilistic RNA-seq quantification results [1, 2]. \n\n*A list of **all inputs and parameters** with corresponding descriptions can be found at the bottom of the page.*\n\n### Common Use Cases\n\n- A **Transcriptome FASTA file** needs to be provided as an input to the tool. \n\n### Changes Introduced by Seven Bridges\n\n- An already generated **Salmon index archive** can be provided to the **Salmon Index** tool (**Transcriptome FASTA or Salmon Index Archive** input), in order to skip indexing and save a little bit of time if this tool is part of a bigger workflow and there already is an index file that can be provided.\n\n### Common Issues and Important Notes\n\n- The input FASTA file (if provided instead of the already generated salmon index) should be a transcriptome FASTA, not a genomic FASTA.\n\n### Performance Benchmarking\n\nThe **Salmon Index** tool builds the index structure for **Salmon** in a very short time, therefore it is expected that all tasks using this tool should finish in under 5 minutes, costing around $0.05 on the default c4.2xlarge instance (AWS). \n\n*Cost can be significantly reduced by using **spot instances**. Visit the [Knowledge Center](https://docs.sevenbridges.com/docs/about-spot-instances) for more details.*\n\n\n### References\n\n[1] [Salmon paper](biorxiv.org/content/biorxiv/early/2016/08/30/021592.full.pdf)  \n[2] [Rapmap paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4908361/)"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 #&gt; [5] "**Salmon Quant - Reads** infers transcript abundance estimates from **RNA-seq data**, using a process called **quasi-mapping**. \n\n**Quasi-mapping** is a process of assigning reads to transcripts, without doing the exact base-to-base alignment. Seeing that for estimating transcript abundances, the main information needed is which transcript a read originates from and not the actual mapping coordinates, the idea with the **Salmon** tool was to implement a procedure that does exactly that [1, 2]. \n\nThe result is a software running at speeds orders of magnitude faster than other tools which utilize the full likehood model, while keeping near-optimal probabilistic RNA-seq quantification results [1, 2]. \n\nThe latest version of Salmon (0.9.x) introduces some novel concepts, like **Rich Factorization Classes**, which further increase the precision of the results, at a very negligible increase in runtime. This version of Salmon also supports quantification from already aligned BAM files, utilizing the full likelihood model (the same one as in RSEM), where the results are the same as RSEM, but the execution time is much shorter than in RSEM, this time due to engineering only [3].\n\n*A list of **all inputs and parameters** with corresponding descriptions can be found at the bottom of the page.*\n\n### Common Use Cases\n\n- The main input to the tool are **FASTQ read files** (single end or paired end). \n- A **Salmon index archive** (`-i`) also needs to be provided, in addition to an optional **Gene map** (`--geneMap`) file (which should be of the same annotations that were used in generating the **Transcriptome FASTA file**) if gene-level abundance results are desired. \n- The tool will generate transcript abundance estimates in plaintext format, and an optional file containing gene abundance estimates, if the input **Gene map** (`--gene-map`) file is provided. \n- In addition to the default output (**Quantification file**), additional outputs can be produced if the proper options are turned on for them (e.g. **Equivalent class counts** by setting `--dumpEq`, **Unmapped reads** by setting `--writeUnmappedNames`, **Bootstrap data** by setting `--numBootstraps` or `--numGibbsSamples`, **Mapping info** by setting `--write-mappings`...).\n- The **GC bias correction** option (`--gcBias`) will correct for GC bias and improve quantification accuracy, but at the cost of increased runtime (a rough estimate would be a **double** increase in runtime per sample).  \n- The use of *data-driven likelihood factorization* is achieved with the **Range factorization bins** parameter (`--rangeFactorizationBins`) and can be used to bring an increase in accuracy at a very small increase in runtime [3]. \n\n### Changes Introduced by Seven Bridges\n\n- All output files will be prefixed by the input sample ID (inferred from **Sample ID** metadata if existent, or from filename otherwise), instead of having identical names between runs. \n\n### Common Issues and Important Notes\n\n- For paired-end read files, it is important to properly set the **Paired End** metadata field on your read files.\n- For FASTQ reads in multi-file format (i.e. two FASTQ files for paired-end 1 and two FASTQ files for paired-end2), the proper metadata needs to be set (the following hierarchy is valid: **Sample ID/Library ID/Platform Unit ID/File Segment Number)**.\n- The GTF and FASTA files need to have compatible transcript IDs. \n\n### Performance Benchmarking\n\nThe main advantage of the Salmon software is that it is not computationally challenging, as alignment in the traditional sense is not performed. \nBelow is a table describing the runtimes and task costs for a couple of samples with different file sizes:\n\n| Experiment type |  Input size | Paired-end | # of reads | Read length | Duration |  Cost |  Instance (AWS) |\n|:---------------:|:-----------:|:----------:|:----------:|:-----------:|:--------:|:-----:|:----------:|\n|     RNA-Seq     |  2 x 4.5 GB |     Yes    |     20M     |     101     |   5min   | $0.05| c4.2xlarge |\n|     RNA-Seq     | 2 x 17.4 GB |     Yes    |     76M     |     101     |   15min  | $0.15 | c4.2xlarge |\n\n*Cost can be significantly reduced by using **spot instances**. Visit the [Knowledge Center](https://docs.sevenbridges.com/docs/about-spot-instances) for more details.*\n\n### References\n\n[1] [Salmon paper](biorxiv.org/content/biorxiv/early/2016/08/30/021592.full.pdf)   \n[2] [Rapmap paper](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4908361/)   \n[3] [Data-driven likelihood factorization](https://academic.oup.com/bioinformatics/article/33/14/i142/3953977)"</div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -185,7 +184,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

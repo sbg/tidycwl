@@ -6,14 +6,14 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>A Grammar for Tidying CWL Workflows • tidycwl</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="A Grammar for Tidying CWL Workflows">
-<meta property="og:description" content="">
-<meta name="twitter:card" content="summary">
+<meta property="og:description" content="tidycwl">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -25,7 +25,7 @@
   gtag('config', 'UA-87185344-1');
 </script>
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -62,7 +62,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/sbg/tidycwl">
+  <a href="https://github.com/sbg/tidycwl/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -77,14 +77,14 @@
 
       
 
-      </header><script src="tidycwl_files/htmlwidgets-1.5.1/htmlwidgets.js"></script><link href="tidycwl_files/vis-4.20.1/vis.css" rel="stylesheet">
+      </header><script src="tidycwl_files/header-attrs-2.1/header-attrs.js"></script><script src="tidycwl_files/htmlwidgets-1.5.1/htmlwidgets.js"></script><link href="tidycwl_files/vis-4.20.1/vis.css" rel="stylesheet">
 <script src="tidycwl_files/vis-4.20.1/vis.min.js"></script><script src="tidycwl_files/visNetwork-binding-2.0.9/visNetwork.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>A Grammar for Tidying CWL Workflows</h1>
+      <h1 data-toc-skip>A Grammar for Tidying CWL Workflows</h1>
                         <h4 class="author">Nan Xiao &lt;<a href="mailto:nan.xiao@sevenbridges.com" class="email">nan.xiao@sevenbridges.com</a>&gt;</h4>
             
-            <h4 class="date">2019-12-07</h4>
+            <h4 class="date">2020-04-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/sbg/tidycwl/blob/master/vignettes/tidycwl.Rmd"><code>vignettes/tidycwl.Rmd</code></a></small>
       <div class="hidden name"><code>tidycwl.Rmd</code></div>
@@ -98,15 +98,15 @@
 <a href="#introduction" class="anchor"></a>Introduction</h1>
 <p>The tidycwl package takes the raw Common Workflow Language (CWL) workflows encoded in JSON or YAML, and turns the workflow elements into tidy data frames or structured lists. This package follows the <a href="https://principles.tidyverse.org/">tidyverse design principles</a> and can be seamlessly used together with the other packages with similar designs.</p>
 <p>Let’s use a real-world example to see how we can read, parse, and visualize a bioinformatics workflow with tidycwl.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"tidycwl"</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="st">"tidycwl"</span>)</pre></body></html></div>
 </div>
 <div id="read-workflow" class="section level1">
 <h1 class="hasAnchor">
 <a href="#read-workflow" class="anchor"></a>Read workflow</h1>
 <p>To read a CWL workflow into R, use <code><a href="../reference/read_cwl_json.html">read_cwl_json()</a></code>, <code><a href="../reference/read_cwl_yaml.html">read_cwl_yaml()</a></code>, or <code><a href="../reference/read_cwl.html">read_cwl(format = ...)</a></code> depending on the workflow storage format.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>flow &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"cwl/sbg/workflow/gatk4-wgs.json"</span>, <span class="dt">package =</span> <span class="st">"tidycwl"</span>) <span class="op">%&gt;%</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="st">  </span><span class="kw"><a href="../reference/read_cwl_json.html">read_cwl_json</a></span>()</span>
-<span id="cb2-3"><a href="#cb2-3"></a>flow</span></code></pre></div>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">flow</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span>(<span class="st">"cwl/sbg/workflow/gatk4-wgs.json"</span>, <span class="kw">package</span> <span class="kw">=</span> <span class="st">"tidycwl"</span>) <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/read_cwl_json.html">read_cwl_json</a></span>()
+<span class="no">flow</span></pre></body></html></div>
 <pre><code>Name: Whole Genome Sequencing - BWA + GATK 4.0 (with Metrics) 
 Class: Workflow 
 CWL Version: sbg:draft-2 </code></pre>
@@ -117,21 +117,21 @@ CWL Version: sbg:draft-2 </code></pre>
 <a href="#parse-workflow" class="anchor"></a>Parse workflow</h1>
 <p>After reading the workflow into R, let’s parse the main components from the CWL.</p>
 <p>Besides the type (<code><a href="../reference/parse_type.html">parse_type()</a></code>) and metadata (<code><a href="../reference/parse_meta.html">parse_meta()</a></code>), we are more than interested in the core components of a workflow, namely, the inputs, outputs, and the intermediate steps.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>flow <span class="op">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2"></a><span class="st">  </span><span class="kw"><a href="../reference/parse_inputs.html">parse_inputs</a></span>() <span class="op">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3"></a><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">flow</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/parse_inputs.html">parse_inputs</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</pre></body></html></div>
 <pre><code>[1] "sbg:fileTypes"        "label"                "id"                  
 [4] "sbg:includeInPorts"   "type"                 "description"         
 [7] "sbg:category"         "sbg:toolDefaultValue"</code></pre>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>flow <span class="op">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a><span class="st">  </span><span class="kw"><a href="../reference/parse_outputs.html">parse_outputs</a></span>() <span class="op">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">flow</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/parse_outputs.html">parse_outputs</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</pre></body></html></div>
 <pre><code>[1] "source"             "label"              "required"          
 [4] "id"                 "sbg:includeInPorts" "type"              
 [7] "sbg:fileTypes"     </code></pre>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>flow <span class="op">%&gt;%</span></span>
-<span id="cb8-2"><a href="#cb8-2"></a><span class="st">  </span><span class="kw"><a href="../reference/parse_steps.html">parse_steps</a></span>() <span class="op">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="no">flow</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/parse_steps.html">parse_steps</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>()</pre></body></html></div>
 <pre><code>[1] "sbg:x"   "inputs"  "outputs" "run"     "id"      "sbg:y"   "scatter"</code></pre>
 <p>Depending on whether these components are represented as YAML/JSON dictionaries or lists in the workflow, the parsed results could be data frames or lists. This is because we want to keep the transformations for the original data minimal, at least at this stage. Plus, these results are not too useful compared to the following granular parsers.</p>
 </div>
@@ -139,9 +139,9 @@ CWL Version: sbg:draft-2 </code></pre>
 <h1 class="hasAnchor">
 <a href="#get-parameters" class="anchor"></a>Get parameters</h1>
 <p>We can use the <code>get_*_*()</code> functions to get the critical parameters, such as the ID, label, or documentation from the parsed inputs, outputs, and steps. For example, use <code><a href="../reference/get_steps_label.html">get_steps_label()</a></code> to get the labels of the steps in the workflow:</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>flow <span class="op">%&gt;%</span></span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="st">  </span><span class="kw"><a href="../reference/parse_steps.html">parse_steps</a></span>() <span class="op">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="st">  </span><span class="kw"><a href="../reference/get_steps_label.html">get_steps_label</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">flow</span> <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/parse_steps.html">parse_steps</a></span>() <span class="kw">%&gt;%</span>
+  <span class="fu"><a href="../reference/get_steps_label.html">get_steps_label</a></span>()</pre></body></html></div>
 <pre><code> [1] "SBG Genome Coverage"                 "SBG Untar fasta"                    
  [3] "Sambamba Merge"                      "SBG FASTQ Quality Adjuster"         
  [5] "Tabix Index"                         "GATK CollectAlignmentSummaryMetrics"
@@ -159,11 +159,11 @@ CWL Version: sbg:draft-2 </code></pre>
 <a href="#get-graph-elements" class="anchor"></a>Get graph elements</h1>
 <p>In many cases, it is useful to construct a graph with the parsed inputs, outputs, and steps from the workflow. The functions <code><a href="../reference/get_nodes.html">get_nodes()</a></code> and <code><a href="../reference/get_edges.html">get_edges()</a></code> can help us tidy the graph nodes and edges into data frames. Each row represents a node or an edge, with each variable representing an attribute of the node or edge.</p>
 <p>The function <code><a href="../reference/get_graph.html">get_graph()</a></code> is a wrapper which returns everything in a list:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw"><a href="../reference/get_graph.html">get_graph</a></span>(</span>
-<span id="cb12-2"><a href="#cb12-2"></a>  flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_inputs.html">parse_inputs</a></span>(),</span>
-<span id="cb12-3"><a href="#cb12-3"></a>  flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_outputs.html">parse_outputs</a></span>(),</span>
-<span id="cb12-4"><a href="#cb12-4"></a>  flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_steps.html">parse_steps</a></span>()</span>
-<span id="cb12-5"><a href="#cb12-5"></a>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>()</span></code></pre></div>
+<div class="sourceCode" id="cb12"><html><body><pre class="r"><span class="fu"><a href="../reference/get_graph.html">get_graph</a></span>(
+  <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_inputs.html">parse_inputs</a></span>(),
+  <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_outputs.html">parse_outputs</a></span>(),
+  <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_steps.html">parse_steps</a></span>()
+) <span class="kw">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>()</pre></body></html></div>
 <pre><code>List of 2
  $ nodes:'data.frame':  36 obs. of  3 variables:
   ..$ id   : chr [1:36] "intervals_file" "dbsnp" "mills" "fastq" ...
@@ -180,15 +180,15 @@ CWL Version: sbg:draft-2 </code></pre>
 <h1 class="hasAnchor">
 <a href="#visualize-workflow" class="anchor"></a>Visualize workflow</h1>
 <p>With tidycwl, we can visualize the workflow graph by calling <code><a href="../reference/visualize_graph.html">visualize_graph()</a></code>, which is built on the <code>visNetwork</code> package with an automatic hierarchical layout:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="cf">if</span> (rmarkdown<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/rmarkdown/man/pandoc_available.html">pandoc_available</a></span>(<span class="st">"1.12.3"</span>)) {</span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="kw"><a href="../reference/get_graph.html">get_graph</a></span>(</span>
-<span id="cb14-3"><a href="#cb14-3"></a>    flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_inputs.html">parse_inputs</a></span>(),</span>
-<span id="cb14-4"><a href="#cb14-4"></a>    flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_outputs.html">parse_outputs</a></span>(),</span>
-<span id="cb14-5"><a href="#cb14-5"></a>    flow <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/parse_steps.html">parse_steps</a></span>()</span>
-<span id="cb14-6"><a href="#cb14-6"></a>  ) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw"><a href="../reference/visualize_graph.html">visualize_graph</a></span>()</span>
-<span id="cb14-7"><a href="#cb14-7"></a>}</span></code></pre></div>
-<div id="htmlwidget-d4156f754ff6eb8659bd" style="width:100%;height:600px;" class="visNetwork html-widget"></div>
-<script type="application/json" data-for="htmlwidget-d4156f754ff6eb8659bd">{"x":{"nodes":{"id":["intervals_file","dbsnp","mills","fastq","reference","known_indels_1000g_bqsr","threads","memory_per_job","Genome_coverage","alignment_summary_metrics","aligned_reads","fastqc_report","gVCF","raw_vcf","SBG_Genome_Coverage","SBG_Untar_fasta","Sambamba_Merge","SBG_FASTQ_Quality_Adjuster","Tabix_Index","GATK_CollectAlignmentSummaryMetrics","SBG_Prepare_Intervals","FastQC","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","Tabix_BGZIP","BWA_MEM_Bundle_0_7_17","GATK_HaplotypeCaller","GATK_IndexFeatureFile","GATK_IndexFeatureFile_1","GATK_IndexFeatureFile_2","GATK_MergeVcfs_1","GATK_GenotypeGVCFs","GATK_MergeVcfs","GATK_ApplyBQSR","GATK_BaseRecalibrator"],"label":["Target BED","dbsnp","Mills","Fastq","Reference or TAR with BWA reference indices","Known indels 1000g bqsr","Threads","Memory Per Job","Genome coverage","Alignment Summary Metrics","Aligned Reads","FastQC Report","gVCF","Raw VCF","SBG Genome Coverage","SBG Untar fasta","Sambamba Merge","SBG FASTQ Quality Adjuster","Tabix Index","GATK CollectAlignmentSummaryMetrics","SBG Prepare Intervals","FastQC","BWA INDEX 0.7.17","SBG Pair FASTQs by Metadata","SBG FASTA Indices","Tabix BGZIP","BWA MEM Bundle 0.7.17","GATK HaplotypeCaller","GATK IndexFeatureFile","GATK IndexFeatureFile","GATK IndexFeatureFile","GATK MergeVcfs","GATK GenotypeGVCFs","GATK MergeVcfs","GATK ApplyBQSR","GATK BaseRecalibrator"],"group":["input","input","input","input","input","input","input","input","output","output","output","output","output","output","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step"]},"edges":{"from":["SBG_FASTA_Indices","Sambamba_Merge","reference","BWA_MEM_Bundle_0_7_17","fastq","Tabix_BGZIP","SBG_FASTA_Indices","Sambamba_Merge","intervals_file","fastq","reference","SBG_FASTQ_Quality_Adjuster","SBG_Untar_fasta","GATK_MergeVcfs_1","threads","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","GATK_ApplyBQSR","memory_per_job","SBG_Prepare_Intervals","GATK_IndexFeatureFile","dbsnp","mills","known_indels_1000g_bqsr","GATK_HaplotypeCaller","GATK_HaplotypeCaller","SBG_FASTA_Indices","GATK_GenotypeGVCFs","SBG_Prepare_Intervals","BWA_MEM_Bundle_0_7_17","GATK_BaseRecalibrator","SBG_FASTA_Indices","BWA_MEM_Bundle_0_7_17","GATK_IndexFeatureFile","GATK_IndexFeatureFile_2","GATK_IndexFeatureFile_1","SBG_Genome_Coverage","GATK_CollectAlignmentSummaryMetrics","Sambamba_Merge","FastQC","Tabix_Index","GATK_MergeVcfs"],"to":["SBG_Genome_Coverage","SBG_Genome_Coverage","SBG_Untar_fasta","Sambamba_Merge","SBG_FASTQ_Quality_Adjuster","Tabix_Index","GATK_CollectAlignmentSummaryMetrics","GATK_CollectAlignmentSummaryMetrics","SBG_Prepare_Intervals","FastQC","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","Tabix_BGZIP","BWA_MEM_Bundle_0_7_17","BWA_MEM_Bundle_0_7_17","BWA_MEM_Bundle_0_7_17","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_IndexFeatureFile","GATK_IndexFeatureFile_1","GATK_IndexFeatureFile_2","GATK_MergeVcfs_1","GATK_GenotypeGVCFs","GATK_GenotypeGVCFs","GATK_MergeVcfs","GATK_ApplyBQSR","GATK_ApplyBQSR","GATK_ApplyBQSR","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","Genome_coverage","alignment_summary_metrics","aligned_reads","fastqc_report","gVCF","raw_vcf"],"port_from":["fasta_reference","merged_bam",null,"aligned_reads",null,"output_file","fasta_reference","merged_bam",null,null,null,"result","output_fasta","output",null,"indexed_reference","tuple_list","fasta_reference","output",null,"intervals","output_with_index",null,null,null,"output_vcf","output_vcf","fasta_reference","vcf","intervals","aligned_reads","recalibration_file","fasta_reference","aligned_reads","output_with_index","output_with_index","output_with_index","summary","summary_metrics","merged_bam","report_html","indexed_file","output"],"port_to":["fasta","bam","input_tar_with_reference","bams","fastq","input_file","REFERENCE_SEQUENCE","INPUT","bed_file","input_fastq","reference","fastq_list","reference","input_file","threads","reference_index_tar","input_reads","reference","reads","memory_per_job","intervals_file","db_snp","feature_file","feature_file","feature_file","input","variants","reference","input","intervals_file","input_bam","bqsr_recal_file","reference","reads","known_sites","known_sites","known_sites",null,null,null,null,null,null],"type":["step_to_step","step_to_step","input_to_step","step_to_step","input_to_step","step_to_step","step_to_step","step_to_step","input_to_step","input_to_step","input_to_step","step_to_step","step_to_step","step_to_step","input_to_step","step_to_step","step_to_step","step_to_step","step_to_step","input_to_step","step_to_step","step_to_step","input_to_step","input_to_step","input_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_output","step_to_output","step_to_output","step_to_output","step_to_output","step_to_output"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","borderWidth":2},"manipulation":{"enabled":false},"edges":{"arrows":{"to":{"enabled":true,"scaleFactor":0.5}},"smooth":{"type":"cubicBezier","roundness":0.6}},"groups":{"input":{"color":"#C3C3C3","shadow":{"enabled":true}},"output":{"color":"#FF8F00","shadow":{"enabled":true}},"useDefaultGroups":true,"step":{"color":"#00AAA8","shadow":{"enabled":true}}},"layout":{"hierarchical":{"enabled":true,"levelSeparation":300,"direction":"LR","sortMethod":"directed"}}},"groups":["input","output","step"],"width":"100%","height":600,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)"},"evals":[],"jsHooks":[]}</script><p>Users can interact with the visualization by zooming in/out and dragging the view or nodes. The graphical details can be further fine-tuned by feeding additional parameters to <code><a href="../reference/visualize_graph.html">visualize_graph()</a></code>.</p>
+<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="kw">if</span> (<span class="kw pkg">rmarkdown</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/rmarkdown/man/pandoc_available.html">pandoc_available</a></span>(<span class="st">"1.12.3"</span>)) {
+  <span class="fu"><a href="../reference/get_graph.html">get_graph</a></span>(
+    <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_inputs.html">parse_inputs</a></span>(),
+    <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_outputs.html">parse_outputs</a></span>(),
+    <span class="no">flow</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/parse_steps.html">parse_steps</a></span>()
+  ) <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/visualize_graph.html">visualize_graph</a></span>()
+}</pre></body></html></div>
+<div id="htmlwidget-aa2ddab64369db60fb83" style="width:100%;height:600px;" class="visNetwork html-widget"></div>
+<script type="application/json" data-for="htmlwidget-aa2ddab64369db60fb83">{"x":{"nodes":{"id":["intervals_file","dbsnp","mills","fastq","reference","known_indels_1000g_bqsr","threads","memory_per_job","Genome_coverage","alignment_summary_metrics","aligned_reads","fastqc_report","gVCF","raw_vcf","SBG_Genome_Coverage","SBG_Untar_fasta","Sambamba_Merge","SBG_FASTQ_Quality_Adjuster","Tabix_Index","GATK_CollectAlignmentSummaryMetrics","SBG_Prepare_Intervals","FastQC","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","Tabix_BGZIP","BWA_MEM_Bundle_0_7_17","GATK_HaplotypeCaller","GATK_IndexFeatureFile","GATK_IndexFeatureFile_1","GATK_IndexFeatureFile_2","GATK_MergeVcfs_1","GATK_GenotypeGVCFs","GATK_MergeVcfs","GATK_ApplyBQSR","GATK_BaseRecalibrator"],"label":["Target BED","dbsnp","Mills","Fastq","Reference or TAR with BWA reference indices","Known indels 1000g bqsr","Threads","Memory Per Job","Genome coverage","Alignment Summary Metrics","Aligned Reads","FastQC Report","gVCF","Raw VCF","SBG Genome Coverage","SBG Untar fasta","Sambamba Merge","SBG FASTQ Quality Adjuster","Tabix Index","GATK CollectAlignmentSummaryMetrics","SBG Prepare Intervals","FastQC","BWA INDEX 0.7.17","SBG Pair FASTQs by Metadata","SBG FASTA Indices","Tabix BGZIP","BWA MEM Bundle 0.7.17","GATK HaplotypeCaller","GATK IndexFeatureFile","GATK IndexFeatureFile","GATK IndexFeatureFile","GATK MergeVcfs","GATK GenotypeGVCFs","GATK MergeVcfs","GATK ApplyBQSR","GATK BaseRecalibrator"],"group":["input","input","input","input","input","input","input","input","output","output","output","output","output","output","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step","step"]},"edges":{"from":["SBG_FASTA_Indices","Sambamba_Merge","reference","BWA_MEM_Bundle_0_7_17","fastq","Tabix_BGZIP","SBG_FASTA_Indices","Sambamba_Merge","intervals_file","fastq","reference","SBG_FASTQ_Quality_Adjuster","SBG_Untar_fasta","GATK_MergeVcfs_1","threads","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","GATK_ApplyBQSR","memory_per_job","SBG_Prepare_Intervals","GATK_IndexFeatureFile","dbsnp","mills","known_indels_1000g_bqsr","GATK_HaplotypeCaller","GATK_HaplotypeCaller","SBG_FASTA_Indices","GATK_GenotypeGVCFs","SBG_Prepare_Intervals","BWA_MEM_Bundle_0_7_17","GATK_BaseRecalibrator","SBG_FASTA_Indices","BWA_MEM_Bundle_0_7_17","GATK_IndexFeatureFile","GATK_IndexFeatureFile_2","GATK_IndexFeatureFile_1","SBG_Genome_Coverage","GATK_CollectAlignmentSummaryMetrics","Sambamba_Merge","FastQC","Tabix_Index","GATK_MergeVcfs"],"to":["SBG_Genome_Coverage","SBG_Genome_Coverage","SBG_Untar_fasta","Sambamba_Merge","SBG_FASTQ_Quality_Adjuster","Tabix_Index","GATK_CollectAlignmentSummaryMetrics","GATK_CollectAlignmentSummaryMetrics","SBG_Prepare_Intervals","FastQC","BWA_INDEX_1","SBG_Pair_FASTQs_by_Metadata","SBG_FASTA_Indices","Tabix_BGZIP","BWA_MEM_Bundle_0_7_17","BWA_MEM_Bundle_0_7_17","BWA_MEM_Bundle_0_7_17","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_HaplotypeCaller","GATK_IndexFeatureFile","GATK_IndexFeatureFile_1","GATK_IndexFeatureFile_2","GATK_MergeVcfs_1","GATK_GenotypeGVCFs","GATK_GenotypeGVCFs","GATK_MergeVcfs","GATK_ApplyBQSR","GATK_ApplyBQSR","GATK_ApplyBQSR","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","GATK_BaseRecalibrator","Genome_coverage","alignment_summary_metrics","aligned_reads","fastqc_report","gVCF","raw_vcf"],"port_from":["fasta_reference","merged_bam",null,"aligned_reads",null,"output_file","fasta_reference","merged_bam",null,null,null,"result","output_fasta","output",null,"indexed_reference","tuple_list","fasta_reference","output",null,"intervals","output_with_index",null,null,null,"output_vcf","output_vcf","fasta_reference","vcf","intervals","aligned_reads","recalibration_file","fasta_reference","aligned_reads","output_with_index","output_with_index","output_with_index","summary","summary_metrics","merged_bam","report_html","indexed_file","output"],"port_to":["fasta","bam","input_tar_with_reference","bams","fastq","input_file","REFERENCE_SEQUENCE","INPUT","bed_file","input_fastq","reference","fastq_list","reference","input_file","threads","reference_index_tar","input_reads","reference","reads","memory_per_job","intervals_file","db_snp","feature_file","feature_file","feature_file","input","variants","reference","input","intervals_file","input_bam","bqsr_recal_file","reference","reads","known_sites","known_sites","known_sites",null,null,null,null,null,null],"type":["step_to_step","step_to_step","input_to_step","step_to_step","input_to_step","step_to_step","step_to_step","step_to_step","input_to_step","input_to_step","input_to_step","step_to_step","step_to_step","step_to_step","input_to_step","step_to_step","step_to_step","step_to_step","step_to_step","input_to_step","step_to_step","step_to_step","input_to_step","input_to_step","input_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_step","step_to_output","step_to_output","step_to_output","step_to_output","step_to_output","step_to_output"]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","borderWidth":2},"manipulation":{"enabled":false},"edges":{"arrows":{"to":{"enabled":true,"scaleFactor":0.5}},"smooth":{"type":"cubicBezier","roundness":0.6}},"groups":{"input":{"color":"#C3C3C3","shadow":{"enabled":true}},"output":{"color":"#FF8F00","shadow":{"enabled":true}},"useDefaultGroups":true,"step":{"color":"#00AAA8","shadow":{"enabled":true}}},"layout":{"hierarchical":{"enabled":true,"levelSeparation":300,"direction":"LR","sortMethod":"directed"}}},"groups":["input","output","step"],"width":"100%","height":600,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)"},"evals":[],"jsHooks":[]}</script><p>Users can interact with the visualization by zooming in/out and dragging the view or nodes. The graphical details can be further fine-tuned by feeding additional parameters to <code><a href="../reference/visualize_graph.html">visualize_graph()</a></code>.</p>
 <p>The visualizations can be exported as HTML or static images (PNG/JPEG/PDF) with <code><a href="../reference/export_html.html">export_html()</a></code> and <code><a href="../reference/export_image.html">export_image()</a></code>.</p>
 </div>
 <div id="shiny-widget" class="section level1">
@@ -198,22 +198,11 @@ CWL Version: sbg:draft-2 </code></pre>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#introduction">Introduction</a></li>
-      <li><a href="#read-workflow">Read workflow</a></li>
-      <li><a href="#parse-workflow">Parse workflow</a></li>
-      <li><a href="#get-parameters">Get parameters</a></li>
-      <li><a href="#get-graph-elements">Get graph elements</a></li>
-      <li><a href="#visualize-workflow">Visualize workflow</a></li>
-      <li><a href="#shiny-widget">Shiny widget</a></li>
-      </ul>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
 
@@ -224,7 +213,7 @@ CWL Version: sbg:draft-2 </code></pre>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>

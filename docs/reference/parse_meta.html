@@ -10,23 +10,27 @@
 
 
 <!-- jquery -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous" />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script>
+
+<!-- bootstrap-toc -->
+<link rel="stylesheet" href="../bootstrap-toc.css">
+<script src="../bootstrap-toc.js"></script>
 
 <!-- Font Awesome icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous" />
 
 <!-- clipboard.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script>
 
 <!-- headroom.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script>
 
 <!-- pkgdown -->
 <link href="../pkgdown.css" rel="stylesheet">
@@ -39,7 +43,6 @@
 
 <meta property="og:title" content="Parse the metadata in the CWL workflow — parse_meta" />
 <meta property="og:description" content="Parse the metadata in the CWL workflow" />
-<meta name="twitter:card" content="summary" />
 
 
 
@@ -67,7 +70,7 @@
 
   </head>
 
-  <body>
+  <body data-spy="scroll" data-target="#toc">
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -105,7 +108,7 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="https://github.com/sbg/tidycwl">
+  <a href="https://github.com/sbg/tidycwl/">
     <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
@@ -172,14 +175,10 @@
 #&gt; [1] "This Whole Genome Sequencing (WGS) workflow identifies variants from a human whole-genome resequencing experiment by using the [Broad Institute's](https://software.broadinstitute.org/gatk/best-practices/) best-practices workflow for alignment and variant calling.\n\nThis workflow performs optimally on data from experiments which utilize a PCR-free library preparation protocol and targets 30x mean coverage across the genome. However, it is also suitable for a range of coverages (verified up to 150x). Although WGS generally has lower coverage than Whole Exome Sequencing (WES), this method can detect variants outside of protein-coding areas and can detect changes affecting regulatory regions and various controlling mechanisms. These characteristics allow for a wider application of the workflow, especially in cases when novel variants are expected. For example, WGS can be used if the phenotype or family history strongly implicates genetic etiology but the phenotype does not correspond to a specific disorder for which a test targeting a particular gene is clinically available.\n\n## Workflow structure\n\nThe workflow follows the Broad Institute’s best practices and utilizes the Broad Institute's GATK 4.0.0.0 tools. A separate step is undertaken to assess the quality of sequenced reads using Babraham Institute's tool, FastQC. \n\nSequenced reads are first aligned with the BWA-MEM 0.7.17 tool. Then, duplicates are removed. The next step uses algorithms developed by the Broad Institute to do a re-evaluation of the qualities of sequenced bases. Generated BAM files are pooled together, and variant calling is performed. For more information on how variant calling is performed, please refer to the [Broad Institute's web site](https://software.broadinstitute.org/gatk/best-practices/).\n\nTo obtain the optimal usage of a computational instance’s resources, analysis is divided into a number of jobs which correspond to the number of *chromosomal* regions in the input BED file plus one additional job for much smaller, mitochondrial, and global contigs. The SBG PrepareIntervals tool splits the input BED file (Target BED) into several smaller BED files. GATK BaseRecalibrator, set to use only reads from chromosome 20, collects all the BAM files and uses only those covered with the BQSR intervals string input to create the model for base quality score recalibration (BQSR). This lowers execution time while preserving a similar quality of recalibration. GATK ApplyBQSR applies quality mapping table received from GATK BaseRecalibrator to the BAMs received from BWA-MEM. GATK ApplyBQSR also works in scatter mode set on intervals input (one job per BED file) received from the SBG PrepareIntervals tool. GATK HaplotypeCaller is scattered by BAM file received from GATK ApplyBQSR and performs variant calling on each of the BAMs, outputting raw genotype variant calling files (GVCF). Each of the GVCFs is passed to GATK GenotypeGVCFs which converts it to a VCF. All GVCFs and VCFs from the intervals are merged.\n\n## Workflow performance\n\n| Sample             | Instance type (c5 instance) | Execution time | Cost (Spot) | Cost (On demand) | Instance type (c4 instance) | Execution time | Cost (Spot) | Cost (On demand) |\n|--------------------|-----------------------------|----------------|-------------|------------------|-----------------------------|----------------|-------------|------------------|\n| HG001 30x PCR-free | c5.9xlarge (HDD 700GB)      | 7:24:04        | 5.51$       | 11.49$           | c4.8xlarge (HDD 700GB)      | 8:32:28        | 4.68$       | 13.78$           |\n| HG001 30x PCR-prep | c5.9xlarge (HDD 700GB)      | 10:09:22       | 7.56$       | 15.77$           | c4.8xlarge (HDD 700GB)      | 12:59:43       | 7.11$       | 20.97$           |\n| HG001 50x PCR-free | c5.9xlarge (HDD 700GB)      | 10:35:15       | 7.88$       | 16.44$           | c4.8xlarge (HDD 700GB)      | 12:44:03       | 7.56$       | 20.54$           |\n\n## Required inputs\n\n- Reference or TAR with BWA reference indices\n- Target BED file - Chromosomal intervals of this BED are used for parallelization (scattering)\n- DBSNP database - Database with known variants from the population used with base quality score recalibration, variant calling and variant quality score recalibration\n- Mills INDEL database - Database of known indels in the population used with variant recalibration (VCF)\n- Known indels 1000g fused with BQSR\n- FASTQ reads Illumina paired-end reads from the sequencer.\n- Threads for BWA MEM (default value is 36, which is equal to the number of CPUs on the c4.8xlarge instance)\n- Threads for Sambamba sort (default value is 36, which is equal to the number of CPUs on the c4.8xlarge instance)\n- Memory per job for HaplotypeCaller (default value is 2200 MB)\n\n## Outputs\n\n- Genome coverage metrics\n- Alignment metrics\n- Genotype variant calling format file (GVCF)\n- Aligned Reads from BWA-MEM ([BAM](https://samtools.github.io/hts-specs/SAMv1.pdf))\n- Raw variant calling format file (VCF)\n- FastQC Report\n\n## Important issues\n\n- In order to complete the execution of the workflow, the following fields in the metadata of FASTQ files must be set: **Paired-end, Sample ID and Platform**.\n- All reference files must correspond to the same reference genome (HG19, GRCh 37, HG38,...). If some of the reference files has contigs not listed in reference genome the pipeline cannot be executed.\n- BWA-MEM index files are packed together with the reference genome in the TAR files which are available on SBG Public files. With that indexing step in the pipeline can be skipped and its total execution will be faster.\n- If HG38 is used, it is recommended to lower the number of BWA MEM and Sambamba sort threads. For input files with ~30x coverage the recommended value for both parameters is 15, while for input files with ~50x coverage the recommended value for both parameters is 10. If threads number is not set and HG38 is used the threads for BWA-MEM will be set to 10.\n- If HG38 is used, it is recommended to increase the memory per job for HaplotypeCaller from 2048 MB to at least 4096 MB depending on the type of sample and coverage. If memory_per_job for HaplotypeCaller is not set and HG38 is used the memory for HaplotypeCaller is set 4096 MB.\n-  If HG38 is used it will automatically perform alt contig processing from [Broad](https://gatkforums.broadinstitute.org/gatk/discussion/8017/how-to-map-reads-to-a-reference-with-alternate-contigs-like-grch38) by including additional alt index from bwa.kit. The alignments on primary assembly reference will be done correctly and for proper alignment on alt contigs please run additional post processing.\n- Variant Quality Score Recalibration (VQSR) has been left out of this workflow since it is not optimized for single sample filtering and is also going to be deprecated by Broad's upcoming [deep learning](https://software.broadinstitute.org/gatk/blog?id=10996) filtering. This workflow will feature the new deep learning tool once it becomes available."
 #&gt; </div></pre>
   </div>
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-    <h2>Contents</h2>
-    <ul class="nav nav-pills nav-stacked">
-      <li><a href="#arguments">Arguments</a></li>
-      <li><a href="#value">Value</a></li>
-      <li><a href="#examples">Examples</a></li>
-    </ul>
-
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 
@@ -190,7 +189,7 @@
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
 </div>
 
       </footer>
