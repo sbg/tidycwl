@@ -41,10 +41,10 @@ inputs:
       in a simple tab-delimited format where each line contains the name of a
       transcript and the gene to which it belongs separated by a tab.  The
       extension of the file is used to determine how the file should be parsed. 
-      Files ending in '.gtf’, ‘.gff’ or '.gff3’ are assumed to be in GTF format;
+      Files ending in '.gtf', '.gff' or '.gff3' are assumed to be in GTF format;
       files with any other extension are assumed to be in the simple format. In
-      GTF/GFF format, the ‘transcript_id’ is assumed to contain the transcript
-      identifier and the ‘gene_id’ is assumed to contain the corresponding gene
+      GTF/GFF format, the 'transcript_id' is assumed to contain the transcript
+      identifier and the 'gene_id' is assumed to contain the corresponding gene
       identifier.
     description: >-
       File containing a mapping of transcripts to genes.  If this file is
@@ -54,10 +54,10 @@ inputs:
       in a simple tab-delimited format where each line contains the name of a
       transcript and the gene to which it belongs separated by a tab.  The
       extension of the file is used to determine how the file should be parsed. 
-      Files ending in '.gtf’, ‘.gff’ or '.gff3’ are assumed to be in GTF format;
+      Files ending in '.gtf', '.gff' or '.gff3' are assumed to be in GTF format;
       files with any other extension are assumed to be in the simple format. In
-      GTF/GFF format, the ‘transcript_id’ is assumed to contain the transcript
-      identifier and the ‘gene_id’ is assumed to contain the corresponding gene
+      GTF/GFF format, the 'transcript_id' is assumed to contain the transcript
+      identifier and the 'gene_id' is assumed to contain the corresponding gene
       identifier.
     format: 'GTF,GFF,GFF3'
     'sbg:includeInPorts': true
@@ -2222,9 +2222,9 @@ steps:
             O=outword, M=matching. The second part of the read library string
             specifies whether the protocol is stranded or unstranded; the
             options are: S=stranded, U=unstranded. If the protocol is
-            unstranded, then we’re done. The final part of the library string
+            unstranded, then we're done. The final part of the library string
             specifies the strand from which the read originates in a
-            strand-specific protocol — it is only provided if the library is
+            strand-specific protocol --- it is only provided if the library is
             stranded (i.e. if the library format string is of the form S). The
             possible values are: F=read 1 (or single-end read) comes from the
             forward strand, R=read 1 (or single-end read) comes from the reverse
@@ -2350,11 +2350,11 @@ steps:
             either a GTF file, or a in a simple tab-delimited format where each
             line contains the name of a transcript and the gene to which it
             belongs separated by a tab.  The extension of the file is used to
-            determine how the file should be parsed.  Files ending in '.gtf’,
-            ‘.gff’ or '.gff3’ are assumed to be in GTF format; files with any
+            determine how the file should be parsed.  Files ending in '.gtf',
+            '.gff' or '.gff3' are assumed to be in GTF format; files with any
             other extension are assumed to be in the simple format. In GTF/GFF
-            format, the ‘transcript_id’ is assumed to contain the transcript
-            identifier and the ‘gene_id’ is assumed to contain the corresponding
+            format, the 'transcript_id' is assumed to contain the transcript
+            identifier and the 'gene_id' is assumed to contain the corresponding
             gene identifier.
         - 'sbg:category': Basic options
           'sbg:toolDefaultValue': 'off'

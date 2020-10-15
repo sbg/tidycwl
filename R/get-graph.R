@@ -76,11 +76,15 @@ get_nodes <- function(inputs, outputs, steps) {
 #' ) %>% str()
 #'
 #' # edges represented by a list
-#' flow <- system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>% read_cwl_yaml()
-#' get_edges(
-#'   flow %>% parse_outputs(),
-#'   flow %>% parse_steps()
-#' ) %>% str()
+#' try(
+#'   flow <- system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>% read_cwl_yaml()
+#' )
+#' try(
+#'   get_edges(
+#'     flow %>% parse_outputs(),
+#'     flow %>% parse_steps()
+#'   ) %>% str()
+#' )
 get_edges <- function(outputs, steps) {
   # edges - only need to look into outputs and steps
   ver <- get_cwl_version_steps(steps)
