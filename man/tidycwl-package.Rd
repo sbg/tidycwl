@@ -25,11 +25,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Nan Xiao \email{nan.xiao@sevenbridges.com} (\href{https://orcid.org/0000-0002-0250-5673}{ORCID})
+\strong{Maintainer}: Soner Koc \email{soner.koc@sevenbridges.com}
 
 Authors:
 \itemize{
-  \item Soner Koc \email{soner.koc@sevenbridges.com}
+  \item Nan Xiao
   \item Dennis Dean \email{dennis.dean@sevenbridges.com} (\href{https://orcid.org/0000-0002-7621-9717}{ORCID})
 }
 

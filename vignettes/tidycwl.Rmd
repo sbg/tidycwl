@@ -1,6 +1,5 @@
 ---
 title: "A Grammar for Tidying CWL Workflows"
-author: "Nan Xiao <<nan.xiao@sevenbridges.com>>"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_document:
