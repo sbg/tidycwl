@@ -1,3 +1,13 @@
+# tidycwl 1.0.5
+
+## Bug Fixes
+
+- Removed the non-ASCII characters in the example data (rnaseq-salmon.cwl) to fix the check error under the Debian Linux environment with the ISO-8859-15 locale.
+
+## Improvements
+
+- Update package maintainer.
+
 # tidycwl 1.0.4
 
 ## Improvements

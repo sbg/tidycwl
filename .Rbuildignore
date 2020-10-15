@@ -5,5 +5,4 @@
 ^pkgdown$
 ^docs$
 ^\.travis\.yml$
-^appveyor\.yml$
 ^cran-comments\.md$
