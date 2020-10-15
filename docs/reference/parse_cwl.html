@@ -58,16 +58,6 @@ inputs, outputs, and steps in a list." />
 <![endif]-->
 
 
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-87185344-1"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-87185344-1');
-</script>
-
 
   </head>
 
@@ -85,7 +75,7 @@ inputs, outputs, and steps in a list." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tidycwl</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
       </span>
     </div>
 
@@ -137,7 +127,7 @@ inputs, outputs, and steps in a list." />
 inputs, outputs, and steps in a list.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>parse_cwl</span>(<span class='no'>x</span>)</pre>
+    <pre class="usage"><span class='fu'>parse_cwl</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -153,10 +143,11 @@ inputs, outputs, and steps in a list.</p>
     <p>List of CWL metadata, inputs, outputs, and steps</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span>(<span class='st'>"cwl/sbg/workflow/rnaseq-salmon.cwl"</span>, <span class='kw'>package</span> <span class='kw'>=</span> <span class='st'>"tidycwl"</span>) <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='read_cwl_yaml.html'>read_cwl_yaml</a></span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'>parse_cwl</span>() <span class='kw'>%&gt;%</span>
-  <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span>()</div><div class='output co'>#&gt; [1] "meta"    "steps"   "inputs"  "outputs"</div></pre>
+    <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/system.file.html'>system.file</a></span><span class='op'>(</span><span class='st'>"cwl/sbg/workflow/rnaseq-salmon.cwl"</span>, package <span class='op'>=</span> <span class='st'>"tidycwl"</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='read_cwl_yaml.html'>read_cwl_yaml</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'>parse_cwl</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>%&gt;%</span>
+  <span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; [1] "meta"    "steps"   "inputs"  "outputs"</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
@@ -168,11 +159,11 @@ inputs, outputs, and steps in a list.</p>
 
       <footer>
       <div class="copyright">
-  <p>Developed by Nan Xiao, Soner Koc, Dennis Dean, Seven Bridges Genomics.</p>
+  <p>Developed by Soner Koc, Nan Xiao, Dennis Dean, Seven Bridges Genomics.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
