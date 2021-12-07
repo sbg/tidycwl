@@ -1,6 +1,6 @@
 # tidycwl
 
-[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental-1)
 [![CRAN Version](https://www.r-pkg.org/badges/version/tidycwl)](https://cran.r-project.org/package=tidycwl)
 [![Travis build status](https://travis-ci.org/sbg/tidycwl.svg?branch=master)](https://travis-ci.org/sbg/tidycwl)
 [![Downloads from the RStudio CRAN mirror](https://cranlogs.r-pkg.org/badges/grand-total/tidycwl)](https://cran.r-project.org/package=tidycwl)

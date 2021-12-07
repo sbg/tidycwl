@@ -1,10 +1,11 @@
 Package: tidycwl
 Type: Package
 Title: Tidy Common Workflow Language Tools and Workflows
-Version: 1.0.5
+Version: 1.0.6
 Authors@R: c(
-    person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut", "cre")),
-    person("Nan", "Xiao", role = c("aut")),
+    person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0772-6600")),
+    person("Jeffrey", "Grover", email = "jeffrey.grover@sevenbridges.com", role = c("aut"), comment = c(ORCID = "0000-0001-6246-1767")),
+    person("Nan", "Xiao", role = c("aut"), comment = c(ORCID = "0000-0002-0250-5673")),
     person("Dennis", "Dean", email = "dennis.dean@sevenbridges.com", role = c("aut"),
            comment = c(ORCID = "0000-0002-7621-9717")),
     person("Seven Bridges Genomics", role = c("cph", "fnd"))
