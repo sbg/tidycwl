@@ -27,6 +27,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -39,18 +41,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">tidycwl</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">1.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.6</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/tidycwl.html">Get started</a>
 </li>
@@ -63,8 +59,8 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/sbg/tidycwl/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+  <a href="https://github.com/sbg/tidycwl/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -80,27 +76,27 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="tidycwl" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#tidycwl" class="anchor"></a>tidycwl</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="tidycwl">tidycwl<a class="anchor" aria-label="anchor" href="#tidycwl"></a>
+</h1></div>
 
 <p>Read, parse, and visualize Common Workflow Language (CWL) workflows.</p>
-<p>The <a href="https://www.commonwl.org/">Common Workflow Language</a> is an open standard for describing data analysis workflows. This package takes the raw Common Workflow Language workflows encoded in JSON or YAML and turns the workflow elements into tidy data frames or lists. A graph representation for the workflow can be constructed and visualized with the parsed workflow inputs, outputs, and steps. Users can embed the visualizations in their Shiny applications, and export them as HTML files or static images.</p>
-<p>Check out the <a href="https://sbg.github.io/tidycwl/articles/tidycwl.html">vignette</a> for a quick introduction.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<p>The <a href="https://www.commonwl.org/" class="external-link">Common Workflow Language</a> is an open standard for describing data analysis workflows. This package takes the raw Common Workflow Language workflows encoded in JSON or YAML and turns the workflow elements into tidy data frames or lists. A graph representation for the workflow can be constructed and visualized with the parsed workflow inputs, outputs, and steps. Users can embed the visualizations in their Shiny applications, and export them as HTML files or static images.</p>
+<p>Check out the <a href="https://sbg.github.io/tidycwl/articles/tidycwl.html" class="external-link">vignette</a> for a quick introduction.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p>To download and install <code>tidycwl</code> from CRAN:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"tidycwl"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"tidycwl"</span><span class="op">)</span></code></pre></div>
 <p>Or try the development version on GitHub:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="co"># install.packages("remotes")</span>
-<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"sbg/tidycwl"</span><span class="op">)</span></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
+<span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sbg/tidycwl"</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="copyright" class="section level2">
-<h2 class="hasAnchor">
-<a href="#copyright" class="anchor"></a>Copyright</h2>
+<div class="section level2">
+<h2 id="copyright">Copyright<a class="anchor" aria-label="anchor" href="#copyright"></a>
+</h2>
 <p>© 2020 Seven Bridges Genomics, Inc. All rights reserved.</p>
 <p>This project is licensed under the GNU Affero General Public License v3.</p>
 </div>
@@ -109,51 +105,62 @@
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=tidycwl">https://​cloud.r-project.org/​package=tidycwl</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/sbg/tidycwl/">https://​github.com/​sbg/​tidycwl/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/sbg/tidycwl/issues">https://​github.com/​sbg/​tidycwl/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=tidycwl" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/sbg/tidycwl/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/sbg/tidycwl/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.r-project.org/Licenses/AGPL-3">AGPL-3</a></li>
+<li><a href="https://www.r-project.org/Licenses/AGPL-3" class="external-link">AGPL-3</a></li>
 </ul>
 </div>
-<div class="developers">
-<h2>Developers</h2>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
 <ul class="list-unstyled">
-<li>Soner Koc <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Nan Xiao <br><small class="roles"> Author </small>  </li>
-<li>Dennis Dean <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7621-9717" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html#citation">Citing tidycwl</a></li>
+</ul>
+</div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>Soner Koc <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0772-6600" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Jeffrey Grover <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6246-1767" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Nan Xiao <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-0250-5673" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Dennis Dean <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7621-9717" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Seven Bridges Genomics <br><small class="roles"> Copyright holder, funder </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.tidyverse.org/lifecycle/#maturing"><img src="https://img.shields.io/badge/lifecycle-maturing-blue.svg" alt="Lifecycle: maturing"></a></li>
-<li><a href="https://cran.r-project.org/package=tidycwl"><img src="https://www.r-pkg.org/badges/version/tidycwl" alt="CRAN Version"></a></li>
-<li><a href="https://travis-ci.org/sbg/tidycwl"><img src="https://travis-ci.org/sbg/tidycwl.svg?branch=master" alt="Travis build status"></a></li>
-<li><a href="https://cran.r-project.org/package=tidycwl"><img src="https://cranlogs.r-pkg.org/badges/grand-total/tidycwl" alt="Downloads from the RStudio CRAN mirror"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental-1" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://cran.r-project.org/package=tidycwl" class="external-link"><img src="https://www.r-pkg.org/badges/version/tidycwl" alt="CRAN Version"></a></li>
+<li><a href="https://app.travis-ci.com/github/sbg/tidycwl" class="external-link"><img src="https://app.travis-ci.com/sbg/tidycwl.svg?branch=master" alt="Travis build status"></a></li>
+<li><a href="https://cran.r-project.org/package=tidycwl" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/grand-total/tidycwl" alt="Downloads from the RStudio CRAN mirror"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Soner Koc, Nan Xiao, Dennis Dean, Seven Bridges Genomics.</p>
+  <p></p>
+<p>Developed by Soner Koc, Jeffrey Grover, Nan Xiao, Dennis Dean, Seven Bridges Genomics.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
 </div>
 
       </footer>
@@ -161,6 +168,8 @@
 
   
 
+
+  
 
   </body>
 </html>

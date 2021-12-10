@@ -146,6 +146,23 @@ sanitize_outputs_df <- function(outputs) {
   remove_from_df(outputs, .outputs_to_remove)
 }
 
+# clean the metadata fields
+# metadata should include a field called either "docs" or "description" with "docs" being CWL 1.0 compliant
+sanitize_metadata_list <- function(metadata_list) {
+  if (is.null(metadata_list$doc)) {
+    metadata_list["doc"] <- NULL
+  }
+  if (is.null(metadata_list$description)) {
+    metadata_list["description"] <- NULL
+  }
+
+  # If neither doc or description are present, then create a NULL doc field
+  if(!("doc" %in% names(metadata_list)) && !("description" %in% names(metadata_list))) {
+    metadata_list["doc"] <- list(NULL)
+  }
+  return(metadata_list)
+}
+
 # convert list to data frame
 list2df <- function(lst) as.data.frame(dplyr::bind_rows(lst))
 

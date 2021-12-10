@@ -33,14 +33,20 @@ parse_type <- function(x) {
 #'   parse_meta()
 parse_meta <- function(x) {
   if (!is_cwl(x)) stop("not a CWL object")
-  list(
-    "id" = x$"id",
-    "label" = x$"label",
-    "class" = x$"class",
-    "cwlversion" = x$"cwlVersion",
-    "sbg:revision" = x$"sbg:revision",
-    "sbg:id" = x$"sbg:id",
-    "description" = x$"description"
+  sanitize_metadata_list(
+    list(
+      "id" = x$"id",
+      "label" = x$"label",
+      "class" = x$"class",
+      "cwlversion" = x$"cwlVersion",
+      "sbg:revision" = x$"sbg:revision",
+      "sbg:id" = x$"sbg:id",
+
+      # Workflow description can be contained in fields labeled either "doc" or "description"
+      # doc is compliant CWL 1.0+ but many legacy apps use the description field instead
+      "doc" = x$"doc",
+      "description" = x$"description"
+    )
   )
 }
 
