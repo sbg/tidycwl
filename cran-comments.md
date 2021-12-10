@@ -1,3 +1,15 @@
+# tidycwl 1.0.6
+
+## Test environments
+
+- Local macOS install, R 4.1.2
+- Ubuntu 16.04.6 LTS (on Travis-CI), R 4.0.2
+- win-builder (release, devel, and oldrelease)
+
+## R CMD check results
+
+There were no ERRORs or WARNINGs.
+
 # tidycwl 1.0.4
 
 ## Test environments

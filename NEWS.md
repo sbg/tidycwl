@@ -6,7 +6,7 @@
 
 ## Improvements
 
-- Added Jeffrey Grover as a Developer
+- Added Jeffrey Grover as the new package maintainer.
 
 # tidycwl 1.0.5
 

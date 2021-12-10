@@ -18,11 +18,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Soner Koc \email{soner.koc@sevenbridges.com} (\href{https://orcid.org/0000-0002-0772-6600}{ORCID})
+\strong{Maintainer}: Jeffrey Grover \email{jeffrey.grover@sevenbridges.com} (\href{https://orcid.org/0000-0001-6246-1767}{ORCID})
 
 Authors:
 \itemize{
-  \item Jeffrey Grover \email{jeffrey.grover@sevenbridges.com} (\href{https://orcid.org/0000-0001-6246-1767}{ORCID})
+  \item Soner Koc \email{soner.koc@sevenbridges.com} (\href{https://orcid.org/0000-0002-0772-6600}{ORCID})
   \item Nan Xiao (\href{https://orcid.org/0000-0002-0250-5673}{ORCID})
   \item Dennis Dean \email{dennis.dean@sevenbridges.com} (\href{https://orcid.org/0000-0002-7621-9717}{ORCID})
 }
