@@ -1,3 +1,13 @@
+# tidycwl 1.0.6
+
+## Bug Fixes
+
+- Fixed the top level description metadata field, which should be defined as "doc" rather than "description." Compatibility is maintained with CWL files which use a "description" field.
+
+## Improvements
+
+- Added Jeffrey Grover as a Developer
+
 # tidycwl 1.0.5
 
 ## Bug Fixes
