@@ -25,7 +25,6 @@ VignetteBuilder: knitr
 URL: https://sbg.github.io/tidycwl/, https://github.com/sbg/tidycwl
 BugReports: https://github.com/sbg/tidycwl/issues
 Encoding: UTF-8
-LazyData: true
 Imports:
     jsonlite,
     yaml,
