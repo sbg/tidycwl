@@ -1,3 +1,9 @@
+# tidycwl 1.0.7
+
+## Improvements
+
+- Changed package maintainer.
+
 # tidycwl 1.0.6
 
 ## Bug Fixes

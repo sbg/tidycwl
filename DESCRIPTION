@@ -1,16 +1,16 @@
 Package: tidycwl
 Type: Package
 Title: Tidy Common Workflow Language Tools and Workflows
-Version: 1.0.6
+Version: 1.0.7
 Authors@R: c(
-    person("Jeffrey", "Grover", email = "jeffrey.grover@sevenbridges.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6246-1767")),
-    person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut"), comment = c(ORCID = "0000-0002-0772-6600")),
+    person("Soner", "Koc", email = "soner.koc@sevenbridges.com", role = c("aut", "cre"), comment = c(ORCID = "0000-0002-0772-6600")),
+    person("Jeffrey", "Grover", email = "jeffrey.grover@sevenbridges.com", role = c("aut"), comment = c(ORCID = "0000-0001-6246-1767")),
     person("Nan", "Xiao", role = c("aut"), comment = c(ORCID = "0000-0002-0250-5673")),
     person("Dennis", "Dean", email = "dennis.dean@sevenbridges.com", role = c("aut"),
            comment = c(ORCID = "0000-0002-7621-9717")),
     person("Seven Bridges Genomics", role = c("cph", "fnd"))
     )
-Maintainer: Jeffrey Grover <jeffrey.grover@sevenbridges.com>
+Maintainer: Soner Koc <soner.koc@sevenbridges.com>
 Description: The Common Workflow Language <https://www.commonwl.org/> is an
     open standard for describing data analysis workflows. This package takes
     the raw Common Workflow Language workflows encoded in JSON or 'YAML'

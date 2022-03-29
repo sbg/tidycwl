@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tidycwl</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.7</span>
       </span>
     </div>
 
@@ -51,10 +51,19 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="1.0.6" id="tidycwl-106">tidycwl 1.0.6<a class="anchor" aria-label="anchor" href="#tidycwl-106"></a></h2>
+<h2 class="page-header" data-toc-text="1.0.7" id="tidycwl-107">tidycwl 1.0.7<a class="anchor" aria-label="anchor" href="#tidycwl-107"></a></h2>
+<div class="section level3">
+<h3 id="improvements-1-0-7">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-7"></a></h3>
+<ul><li>Changed package maintainer.</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="1.0.6" id="tidycwl-106">tidycwl 1.0.6<small>2021-12-14</small><a class="anchor" aria-label="anchor" href="#tidycwl-106"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-6">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-6"></a></h3>
-<ul><li>Fixed the top level description metadata field, which should be defined as “doc” rather than “description.” Compatibility is maintained with CWL files which use a “description” field.</li>
+<ul><li>Fixed the top level description metadata field, which should be
+defined as “doc” rather than “description.” Compatibility is maintained
+with CWL files which use a “description” field.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-1-0-6">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-6"></a></h3>
@@ -65,7 +74,9 @@
 <h2 class="page-header" data-toc-text="1.0.5" id="tidycwl-105">tidycwl 1.0.5<small>2020-10-19</small><a class="anchor" aria-label="anchor" href="#tidycwl-105"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-5">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-5"></a></h3>
-<ul><li>Removed the non-ASCII characters in the example data (rnaseq-salmon.cwl) to fix the check error under the Debian Linux environment with the ISO-8859-15 locale.</li>
+<ul><li>Removed the non-ASCII characters in the example data
+(rnaseq-salmon.cwl) to fix the check error under the Debian Linux
+environment with the ISO-8859-15 locale.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-1-0-5">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-5"></a></h3>
@@ -76,7 +87,8 @@
 <h2 class="page-header" data-toc-text="1.0.4" id="tidycwl-104">tidycwl 1.0.4<small>2019-12-06</small><a class="anchor" aria-label="anchor" href="#tidycwl-104"></a></h2>
 <div class="section level3">
 <h3 id="improvements-1-0-4">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-4"></a></h3>
-<ul><li>Run example code conditionally which requires pandoc to support CRAN’s Solaris environment.</li>
+<ul><li>Run example code conditionally which requires pandoc to support
+CRAN’s Solaris environment.</li>
 <li>Added pandoc to the SystemRequirements field.</li>
 </ul></div>
 </div>
@@ -91,19 +103,26 @@
 <h2 class="page-header" data-toc-text="1.0.2" id="tidycwl-102">tidycwl 1.0.2<a class="anchor" aria-label="anchor" href="#tidycwl-102"></a></h2>
 <div class="section level3">
 <h3 id="improvements-1-0-2">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-2"></a></h3>
-<ul><li>Added single quotes for package names, software names, and API names to the Title and Description section.</li>
-<li>Removed the unnecessary <code>if(interactive()){}</code> statement from the example in <code><a href="../reference/export_html.html">export_html()</a></code>.</li>
-<li>Added PhantomJS to the SystemRequirements field as it is an essential system dependency for <code><a href="../reference/export_image.html">export_image()</a></code>.</li>
+<ul><li>Added single quotes for package names, software names, and API names
+to the Title and Description section.</li>
+<li>Removed the unnecessary <code>if(interactive()){}</code> statement
+from the example in <code><a href="../reference/export_html.html">export_html()</a></code>.</li>
+<li>Added PhantomJS to the SystemRequirements field as it is an
+essential system dependency for <code><a href="../reference/export_image.html">export_image()</a></code>.</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="1.0.1" id="tidycwl-101">tidycwl 1.0.1<a class="anchor" aria-label="anchor" href="#tidycwl-101"></a></h2>
 <div class="section level3">
 <h3 id="improvements-1-0-1">Improvements<a class="anchor" aria-label="anchor" href="#improvements-1-0-1"></a></h3>
-<ul><li>Added more details about the package functionality to the Description text.</li>
-<li>Updated the examples in <code><a href="../reference/export_html.html">export_html()</a></code> and <code><a href="../reference/export_image.html">export_image()</a></code> to write files to temporary folder.</li>
-<li>Added the <code>\value</code> RD tag to exported functions to explain the return results.</li>
-<li>Imported and re-exported the pipe operator to simplify the example code.</li>
+<ul><li>Added more details about the package functionality to the
+Description text.</li>
+<li>Updated the examples in <code><a href="../reference/export_html.html">export_html()</a></code> and
+<code><a href="../reference/export_image.html">export_image()</a></code> to write files to temporary folder.</li>
+<li>Added the <code>\value</code> RD tag to exported functions to
+explain the return results.</li>
+<li>Imported and re-exported the pipe operator to simplify the example
+code.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -123,11 +142,13 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Jeffrey Grover, Soner Koc, Nan Xiao, Dennis Dean, Seven Bridges Genomics.</p>
+  <p></p><p>Developed by Soner Koc, Jeffrey Grover, Nan Xiao, Dennis Dean, Seven
+Bridges Genomics.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a>
+2.0.1.</p>
 </div>
 
       </footer></div>
