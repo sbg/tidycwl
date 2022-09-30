@@ -1,3 +1,10 @@
+#' Changelog
+#' ---  Saul E. Acevedo 9/29/2022
+#'     --- Added if statments that replace id with labels if they do not exist for inputs or outputs
+#'     --- Added support for CWL v1.1 and v1.2
+
+
+
 #' Get CWL version
 #'
 #' @param x CWL object
@@ -74,7 +81,7 @@ get_inputs_id <- function(inputs) {
 #'   get_inputs_label()
 get_inputs_label <- function(inputs) {
   if (is_cwl_dict(inputs)) {
-    label <- inputs$label
+    label <- replace_labels_if_null(inputs)
   } else if (is_cwl_list(inputs)) {
     label <- get_el_from_list(inputs, "label")
   } else {
@@ -116,6 +123,31 @@ get_outputs_id <- function(outputs) {
   id
 }
 
+#' replace ids with labels if labels do not exist. Otherwise, return labels. S.E.A 9/29/2022
+#'
+#' @param x any object
+#'
+#' @return Vector of labels
+#'
+#' @export replace_labels_if_null
+#'
+#' @examples
+#' # inputs represented by a dictionary
+#' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
+#'   read_cwl_json() %>%
+#'   parse_outputs() %>%
+#'   replace_labels_if_null()
+
+replace_labels_if_null <- function(x) {
+  if(!is.null(x$label)){
+    label <- x$label
+  } else {
+    label <- remove_hashtag(x$id)
+    label <- remove_underscores(x$id)
+  }
+  label
+}
+
 #' Get label for outputs
 #'
 #' @param outputs Parsed outputs
@@ -138,7 +170,7 @@ get_outputs_id <- function(outputs) {
 #'   get_outputs_label()
 get_outputs_label <- function(outputs) {
   if (is_cwl_dict(outputs)) {
-    label <- outputs$label
+    label <- replace_labels_if_null(outputs)
   } else if (is_cwl_list(outputs)) {
     label <- get_el_from_list(outputs, "label")
   } else {
@@ -247,10 +279,15 @@ get_steps_doc <- function(steps) {
 
   # get cwl version the hard way
   param <- NULL
+    # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
   if ("v1.0" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "doc"
+  if ("v1.1" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "doc"
+  if ("v1.2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "doc"
   if ("sbg:draft-2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "description"
   if (is.null(param)) {
     if ("v1.0" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "doc"
+    if ("v1.1" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "doc"
+    if ("v1.2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "doc"
     if ("sbg:draft-2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "description"
   }
 
@@ -343,10 +380,15 @@ get_steps_revision <- function(steps) {
 
   # get cwl version the hard way
   param <- NULL
+  # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
   if ("v1.0" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "sbg:latestRevision"
+  if ("v1.1" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "sbg:latestRevision"
+  if ("v1.2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "sbg:latestRevision"
   if ("sbg:draft-2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- "sbg:revision"
   if (is.null(param)) {
     if ("v1.0" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "sbg:latestRevision"
+    if ("v1.1" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "sbg:latestRevision"
+    if ("v1.2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "sbg:latestRevision"
     if ("sbg:draft-2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) param <- "sbg:revision"
   }
 
