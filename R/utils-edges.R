@@ -1,10 +1,33 @@
-# get cwl version from steps (the hard way)
+#' Changelog
+#' ---  Saul E. Acevedo 9/28/2022
+#'     --- Added support for CWL versions 1.1 and 1.2
+#'     --- Added remove_underscores function
+#'     --- Added additional documentation to functions
+
+
+#' get cwl version from steps (the hard way)
+#' 
+#' @param steps Parsed steps
+#' 
+#' @return Returns a string that describes the version of CWL in file
+#' 
+#' @export get_cwl_version_steps
+#' 
+#' @examples
+#' system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl") %>%
+#'   read_cwl_json() %>%
+#'   parse_steps() %>%
+#'   get_cwl_version_steps()
 get_cwl_version_steps <- function(steps) {
   ver <- NULL
   if ("v1.0" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.0"
+  if ("v1.1" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.1"
+  if ("v1.2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.2"
   if ("sbg:draft-2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "sbg:draft-2"
   if (is.null(ver)) {
     if ("v1.0" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.0"
+    if ("v1.1" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.1"
+    if ("v1.2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.2"
     if ("sbg:draft-2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "sbg:draft-2"
   }
   ver
@@ -22,9 +45,50 @@ remove_hashtag_df <- function(df) {
   df
 }
 
-# read edges from $outputs
+remove_underscores <- function(x) {
+  x <- gsub("_", " ", x)
+  x
+}
+
+
+#' read edges from $outputs
+#' 
+#' @param output_source Parsed output source
+#' @param outputs Parsed outputs
+#' @param cwl_version Parsed cwl version
+#' 
+#' @return Returns dataframe with output node data
+#' 
+#' @export read_edges_outputs
+#' 
+#' @examples
+#' #' # outputs represented by a dictionary
+#' file <- system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl")
+#' outputs <- file %>% parse_outputs()
+#' steps <- file %>% parse_steps()
+#' ver <- get_cwl_version_steps(steps)
+#' output_source <- unlist(outputs[[source_name]])
+#' read_edges_outputs(
+#'    output_source,
+#'    outputs,
+#'    ver
+#' )
+#'
+#' # outouts represented by a list
+#' system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>%
+#' outputs <- file %>% parse_outputs()
+#' steps <- file %>% parse_steps()
+#' ver <- get_cwl_version_steps(steps)
+#' output_source <- unlist(get_el_from_list(outputs, source_name))
+#' read_edges_outputs(
+#'    output_source,
+#'    outputs,
+#'    ver
+#' )
 read_edges_outputs <- function(output_source, outputs, cwl_version) {
   if (cwl_version == "v1.0") sep <- "/"
+  if (cwl_version == "v1.1") sep <- "/"
+  if (cwl_version == "v1.2") sep <- "/"
   if (cwl_version == "sbg:draft-2") sep <- "\\."
 
   df <- data.frame(
@@ -58,9 +122,43 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
   df %>% remove_hashtag_df()
 }
 
-# read edges from $steps$in
+#' read edges from $steps$in
+#' 
+#' @param steps_in inputs for steps
+#' @param steps Parsed steps
+#' @param cwl_version Parsed cwl version
+#' 
+#' @return Returns dataframe with step edges data
+#' 
+#' @export read_edges_steps
+#' 
+#' @examples
+#' #' # steps represented by a dictionary
+#' file <- system.file("cwl/sbg/workflow/rnaseq-salmon.json", package = "tidycwl")
+#' steps <- file %>% parse_steps()
+#' steps_in <- steps[[in_name]]
+#' ver <- get_cwl_version_steps(steps)
+#' output_source <- unlist(outputs[[source_name]])
+#' read_edges_steps(
+#'    steps_in,
+#'    steps,
+#'    ver
+#' )
+#'
+#' # steps represented by a list
+#' system.file("cwl/sbg/workflow/rnaseq-salmon.cwl", package = "tidycwl") %>%
+#' steps <- file %>% parse_steps()
+#' steps_in <- get_el_from_list(steps, in_name)
+#' ver <- get_cwl_version_steps(steps)
+#' read_edges_steps(
+#'    steps_in,
+#'    steps,
+#'    ver
+#' )
 read_edges_steps <- function(steps_in, steps, cwl_version) {
   if (cwl_version == "v1.0") sep <- "/"
+  if (cwl_version == "v1.1") sep <- "/"
+  if (cwl_version == "v1.2") sep <- "/"
   if (cwl_version == "sbg:draft-2") sep <- "\\."
 
   df <- data.frame(
