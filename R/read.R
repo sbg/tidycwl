@@ -1,3 +1,8 @@
+#' Changelog
+#' ---  Saul E. Acevedo 9/29/2022
+#'     --- Added functionality that replace NA values in label column with those in id
+
+
 #' Read a CWL file (JSON format) into a list
 #'
 #' @param file A file path, JSON string, or connection.
@@ -13,6 +18,7 @@
 #'   read_cwl_json()
 read_cwl_json <- function(file) {
   lst <- jsonlite::fromJSON(file)
+  lst <- replace_labels_if_na(lst)
   class(lst) <- "cwl"
   lst
 }
@@ -30,6 +36,7 @@ read_cwl_json <- function(file) {
 #'   read_cwl_yaml()
 read_cwl_yaml <- function(file) {
   lst <- yaml::read_yaml(file)
+  lst <- replace_labels_if_na(lst)
   class(lst) <- "cwl"
   lst
 }
