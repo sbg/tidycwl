@@ -1,3 +1,8 @@
+#' Changelog
+#' ---  Saul E. Acevedo 9/28/2022
+#'     --- Added support for CWL versions 1.1 and 1.2
+
+
 #' Get nodes in a CWL workflow into a data frame
 #'
 #' @param inputs Parsed inputs
@@ -91,6 +96,8 @@ get_edges <- function(outputs, steps) {
 
   # edges from outputs
   if (ver == "v1.0") source_name <- "outputSource"
+  if (ver == "v1.1") source_name <- "outputSource"
+  if (ver == "v1.2") source_name <- "outputSource"
   if (ver == "sbg:draft-2") source_name <- "source"
 
   if (is_cwl_dict(outputs)) {
@@ -105,6 +112,8 @@ get_edges <- function(outputs, steps) {
 
   # edges from steps
   if (ver == "v1.0") in_name <- "in"
+  if (ver == "v1.1") in_name <- "in"
+  if (ver == "v1.2") in_name <- "in"
   if (ver == "sbg:draft-2") in_name <- "inputs"
 
   if (is_cwl_dict(steps)) {
