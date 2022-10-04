@@ -50,4 +50,3 @@ visualize_graph <-
         sortMethod = "directed",
       )
   }
-

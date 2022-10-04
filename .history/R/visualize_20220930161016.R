@@ -41,13 +41,12 @@ visualize_graph <-
         arrows = list(to = list(enabled = TRUE, scaleFactor = 0.5)),
         smooth = list(type = "cubicBezier", roundness = 0.6)
       ) %>%
-      visGroups(groupname = input_str_gbl, color = palette[1], shadow = list(enabled = TRUE)) %>%
-      visGroups(groupname = output_str_gbl, color = palette[2], shadow = list(enabled = TRUE)) %>%
-      visGroups(groupname = step_str_gbl, color = palette[3], shadow = list(enabled = TRUE)) %>%
+      visGroups(groupname = "input", color = palette[1], shadow = list(enabled = TRUE)) %>%
+      visGroups(groupname = "output", color = palette[2], shadow = list(enabled = TRUE)) %>%
+      visGroups(groupname = "step", color = palette[3], shadow = list(enabled = TRUE)) %>%
       visHierarchicalLayout(
         enabled = hierarchical,
         direction = direction, levelSeparation = separation,
         sortMethod = "directed",
       )
   }
-

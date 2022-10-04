@@ -16,7 +16,7 @@
 #' system.file("cwl/sbg/workflow/gatk4-wgs.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%
 #'   is_cwl()
-is_cwl <- function(x) if (cwl_str_gbl %in% class(x)) TRUE else FALSE
+is_cwl <- function(x) if ("cwl" %in% class(x)) TRUE else FALSE
 
 #' Is this CWL draft2?
 #'
@@ -68,7 +68,7 @@ is_v1.0 <- function(x) get_cwl_version(x) == ver_1_0_str_gbl
 #'   is_v1.1()
 is_v1.1 <- function(x) get_cwl_version(x) == ver_1_1_str_gbl
 
-#' Is this CWL v1.2? S.E.A 9/29/2022
+#' Is this CWL v1.2?
 #'
 #' @param x CWL object
 #'
@@ -186,7 +186,7 @@ remove_from_list <- function(lst, el) {
 #'
 #' @return Dataframe object with named variables removed
 #'
-#' @export remove_from_df
+#' @export remove_from_df 
 remove_from_df <- function(df, var) {
   for (i in var) df[, i] <- NULL
   df
@@ -203,7 +203,7 @@ remove_from_df <- function(df, var) {
 #' @return Sanitized list of inputs
 #'
 #' @export sanitize_inputs_list
-#'
+#' 
 #' @examples
 #' system.file("cwl/sbg/tool/bwa-mem.json", package = "tidycwl") %>%
 #'   read_cwl(format = "json") %>%

@@ -2,7 +2,6 @@
 #' ---  Saul E. Acevedo 9/29/2022
 #'     --- Added if statments that replace id with labels if they do not exist for inputs or outputs
 #'     --- Added support for CWL v1.1 and v1.2
-#'     --- Allowed replacement of missing description or version objects with NA
 
 
 
@@ -140,6 +139,7 @@ get_outputs_id <- function(outputs) {
 #'   replace_labels_if_null()
 
 replace_labels_if_null <- function(x) {
+  print("Running..... [replace_labels_if_null]")
   if(!is.null(x$label)){
     label <- x$label
   } else {
@@ -281,6 +281,7 @@ get_steps_doc <- function(steps) {
   # get cwl version the hard way
   param <- NULL
     # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
+  print("Running.... [get_steps_doc]")
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
@@ -296,10 +297,6 @@ get_steps_doc <- function(steps) {
     run <- steps$run
     if (is_cwl_dict(run)) {
       desc <- run[[param]]
-      #' replace desc dict with NA values if desc is null. S.E.A 10/04/2022
-      if (is.null(desc)) {
-        desc <- rep(NA, length(steps$id))
-      }
     } else if (is_cwl_list(run)) {
       desc <- get_el_from_list(run, param)
     } else {
@@ -344,10 +341,6 @@ get_steps_version <- function(steps) {
     sbg_tk_ver_str <- "sbg:toolkitVersion"
     if (is_cwl_dict(run)) {
       version <- run$"sbg:toolkitVersion"
-      #' replace version dict with NA values if version is null. S.E.A 10/04/2022
-      if (is.null(version)){
-        version <- rep(NA, length(steps$id))
-      }
     } else if (is_cwl_list(run)) {
       version <- get_el_from_list(run, sbg_tk_ver_str)
     } else {
@@ -393,6 +386,7 @@ get_steps_revision <- function(steps) {
   sbg_lat_rev_str <- "sbg:latestRevision"
   sbg_rev_str <- "sbg:revision"
   # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
+  print("Running.... [get_steps_revision]")
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str

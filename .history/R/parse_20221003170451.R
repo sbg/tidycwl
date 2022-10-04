@@ -1,3 +1,5 @@
+
+rows_str <- "rows"
 #' Parse CWL content type
 #'
 #' @param x CWL object
@@ -80,14 +82,16 @@ parse_inputs <- function(x, simplify = TRUE) {
   inputs <- x$inputs
 
   if (is_literal_list(inputs)) {
+    print("Inputs 1")
     df <- list2df(sanitize_inputs_list(inputs))
   } else if (is_literal_df(inputs)) {
+    print("Input 2")
     df <- sanitize_inputs_df(inputs)
   } else {
     stop("inputs cannot be properly parsed from the CWL object")
   }
 
-  if (!simplify) df <- jsonlite::toJSON(df, dataframe = "rows")
+  if (!simplify) df <- jsonlite::toJSON(df, dataframe = rows_str)
 
   df
 }
@@ -129,7 +133,7 @@ parse_outputs <- function(x, simplify = TRUE) {
     stop("inputs cannot be properly parsed from the CWL object")
   }
 
-  if (!simplify) df <- jsonlite::toJSON(df, dataframe = "rows")
+  if (!simplify) df <- jsonlite::toJSON(df, dataframe = rows_str)
 
   df
 }

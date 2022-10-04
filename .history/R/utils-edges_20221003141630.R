@@ -3,6 +3,8 @@
 #'     --- Added support for CWL versions 1.1 and 1.2
 #'     --- Added remove_underscores function
 #'     --- Added additional documentation to functions
+#' 
+#' 
 
 slash_str <- "/"
 dbl_slash_str <- "\\."
@@ -25,7 +27,6 @@ dbl_slash_str <- "\\."
 get_cwl_version_steps <- function(steps) {
   ver <- NULL
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_0_str_gbl
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_1_str_gbl
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_2_str_gbl
   if (sbg_draft_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- sbg_draft_str_gbl
@@ -92,7 +93,6 @@ remove_underscores <- function(x) {
 #' )
 read_edges_outputs <- function(output_source, outputs, cwl_version) {
   if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
   if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
   if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
   if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str
@@ -108,21 +108,26 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
 
   outputs_id <- outputs %>% get_outputs_id()
   stp_to_out_str <- "step_to_output"
+  from_str <- "from"
+  to_str <- "to"
+  port_from_str <- "port_from"
+  port_to_str <- "port_to"
+  type_str <- "type"
 
   for (i in 1:length(outputs_id)) {
     if (grepl(sep, output_source[i])) {
       val_vec <- strsplit(output_source[i], sep)[[1]]
-      df[i, "from"] <- val_vec[1]
-      df[i, "to"] <- outputs_id[i]
-      df[i, "port_from"] <- val_vec[2]
-      df[i, "port_to"] <- NA
-      df[i, "type"] <- stp_to_out_str
+      df[i, from_str] <- val_vec[1]
+      df[i, to_str] <- outputs_id[i]
+      df[i, port_from_str] <- val_vec[2]
+      df[i, port_to_str] <- NA
+      df[i, type_str] <- stp_to_out_str
     } else {
-      df[i, "from"] <- output_source[i]
-      df[i, "to"] <- outputs_id[i]
-      df[i, "port_from"] <- NA
-      df[i, "port_to"] <- NA
-      df[i, "type"] <- stp_to_out_str
+      df[i, from_str] <- output_source[i]
+      df[i, to_str] <- outputs_id[i]
+      df[i, port_from_str] <- NA
+      df[i, port_to_str] <- NA
+      df[i, type_str] <- stp_to_out_str
     }
   }
 
@@ -164,7 +169,6 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
 #' )
 read_edges_steps <- function(steps_in, steps, cwl_version) {
   if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
   if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
   if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
   if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str

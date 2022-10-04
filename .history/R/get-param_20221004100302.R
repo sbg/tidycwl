@@ -2,7 +2,6 @@
 #' ---  Saul E. Acevedo 9/29/2022
 #'     --- Added if statments that replace id with labels if they do not exist for inputs or outputs
 #'     --- Added support for CWL v1.1 and v1.2
-#'     --- Allowed replacement of missing description or version objects with NA
 
 
 
@@ -140,6 +139,7 @@ get_outputs_id <- function(outputs) {
 #'   replace_labels_if_null()
 
 replace_labels_if_null <- function(x) {
+  print("Running..... [replace_labels_if_null]")
   if(!is.null(x$label)){
     label <- x$label
   } else {
@@ -281,11 +281,13 @@ get_steps_doc <- function(steps) {
   # get cwl version the hard way
   param <- NULL
     # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
+  print("Running.... [get_steps_doc]")
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- doc_str_gbl
   if (sbg_draft_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- desc_str_gbl
   if (is.null(param)) {
+    print("Here 1")
     if (ver_1_0_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) param <- doc_str_gbl
     if (ver_1_1_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) param <- doc_str_gbl
     if (ver_1_2_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) param <- doc_str_gbl
@@ -293,19 +295,23 @@ get_steps_doc <- function(steps) {
   }
 
   if (!is.null(steps$run)) {
+    print("Here 2")
     run <- steps$run
     if (is_cwl_dict(run)) {
+      print("Here 2a1")
       desc <- run[[param]]
-      #' replace desc dict with NA values if desc is null. S.E.A 10/04/2022
-      if (is.null(desc)) {
-        desc <- rep(NA, length(steps$id))
-      }
+      print(desc)
+      print("Here 2a2")
     } else if (is_cwl_list(run)) {
+      print("Here 2b1")
       desc <- get_el_from_list(run, param)
+      print("Here 2b2")
     } else {
+      print("Here 2c")
       stop("`steps$run` is not a proper dict or list")
     }
   } else {
+    print("Here 3")
     if (is_cwl_dict(steps)) {
       desc <- steps[[run_str_gbl]][[param]]
     } else if (is_cwl_list(steps)) {
@@ -343,21 +349,25 @@ get_steps_version <- function(steps) {
     run <- steps$run
     sbg_tk_ver_str <- "sbg:toolkitVersion"
     if (is_cwl_dict(run)) {
+      print("version 1: ")
       version <- run$"sbg:toolkitVersion"
-      #' replace version dict with NA values if version is null. S.E.A 10/04/2022
-      if (is.null(version)){
-        version <- rep(NA, length(steps$id))
-      }
+      print(version)
     } else if (is_cwl_list(run)) {
+      print("version 2: ")
       version <- get_el_from_list(run, sbg_tk_ver_str)
+      print(version)
     } else {
       stop("`steps$run` is not a proper dict or list")
     }
   } else {
     if (is_cwl_dict(steps)) {
+      print("version 3: ")
       version <- steps[[run_str_gbl]][[sbg_tk_ver_str]]
+      print(version)
     } else if (is_cwl_list(steps)) {
+      print("version 4: ")
       version <- unlist(get_el_from_list(get_el_from_list(steps, run_str_gbl), sbg_tk_ver_str))
+      print(version)
     } else {
       stop("`steps` is not a proper dict or list")
     }
@@ -393,6 +403,7 @@ get_steps_revision <- function(steps) {
   sbg_lat_rev_str <- "sbg:latestRevision"
   sbg_rev_str <- "sbg:revision"
   # Added if statements that consider v1.2 and v1.2. S.E.A 9/29/2022
+  print("Running.... [get_steps_revision]")
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) param <- sbg_lat_rev_str

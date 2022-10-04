@@ -215,6 +215,7 @@ remove_from_df <- function(df, var) {
 #'   parse_inputs() %>%
 #'   sanitize_inputs_list()
 sanitize_inputs_list <- function(inputs) {
+  print("Running... [sanitize_inputs_list]")
   remove_from_list(inputs, .inputs_to_remove)
 }
 
@@ -373,5 +374,6 @@ replace_labels_if_na <- function(lst) {
     lst$outputs$label <- remove_hashtag(lst$outputs$label)
     lst$outputs$label <- remove_underscores(lst$outputs$label)
   }
+  print("Running...... [replace_labels_if_na()]")
   lst
 }

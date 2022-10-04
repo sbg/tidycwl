@@ -19,7 +19,7 @@
 read_cwl_json <- function(file) {
   lst <- jsonlite::fromJSON(file)
   lst <- replace_labels_if_na(lst)
-  class(lst) <- cwl_str_gbl
+  class(lst) <- "cwl"
   lst
 }
 
@@ -37,7 +37,7 @@ read_cwl_json <- function(file) {
 read_cwl_yaml <- function(file) {
   lst <- yaml::read_yaml(file)
   lst <- replace_labels_if_na(lst)
-  class(lst) <- cwl_str_gbl
+  class(lst) <- "cwl"
   lst
 }
 

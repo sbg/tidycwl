@@ -4,10 +4,6 @@
 #'     --- Added remove_underscores function
 #'     --- Added additional documentation to functions
 
-slash_str <- "/"
-dbl_slash_str <- "\\."
-
-
 
 #' get cwl version from steps (the hard way)
 #' 
@@ -24,16 +20,15 @@ dbl_slash_str <- "\\."
 #'   get_cwl_version_steps()
 get_cwl_version_steps <- function(steps) {
   ver <- NULL
-  if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_0_str_gbl
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
-  if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_1_str_gbl
-  if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_2_str_gbl
-  if (sbg_draft_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- sbg_draft_str_gbl
+  if ("v1.0" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.0"
+  if ("v1.1" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.1"
+  if ("v1.2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "v1.2"
+  if ("sbg:draft-2" %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- "sbg:draft-2"
   if (is.null(ver)) {
-    if (ver_1_0_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) ver <- ver_1_0_str_gbl
-    if (ver_1_1_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) ver <- ver_1_1_str_gbl
-    if (ver_1_2_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) ver <- ver_1_2_str_gbl
-    if (sbg_draft_str_gbl %in% get_el_from_list(get_el_from_list(steps, run_str_gbl), cwl_ver_str_gbl)) ver <- sbg_draft_str_gbl
+    if ("v1.0" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.0"
+    if ("v1.1" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.1"
+    if ("v1.2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "v1.2"
+    if ("sbg:draft-2" %in% get_el_from_list(get_el_from_list(steps, "run"), "cwlVersion")) ver <- "sbg:draft-2"
   }
   ver
 }
@@ -91,11 +86,10 @@ remove_underscores <- function(x) {
 #'    ver
 #' )
 read_edges_outputs <- function(output_source, outputs, cwl_version) {
-  if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
-  if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
-  if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
-  if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str
+  if (cwl_version == "v1.0") sep <- "/"
+  if (cwl_version == "v1.1") sep <- "/"
+  if (cwl_version == "v1.2") sep <- "/"
+  if (cwl_version == "sbg:draft-2") sep <- "\\."
 
   df <- data.frame(
     "from" = character(),
@@ -107,7 +101,6 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
   )
 
   outputs_id <- outputs %>% get_outputs_id()
-  stp_to_out_str <- "step_to_output"
 
   for (i in 1:length(outputs_id)) {
     if (grepl(sep, output_source[i])) {
@@ -116,13 +109,13 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
       df[i, "to"] <- outputs_id[i]
       df[i, "port_from"] <- val_vec[2]
       df[i, "port_to"] <- NA
-      df[i, "type"] <- stp_to_out_str
+      df[i, "type"] <- "step_to_output"
     } else {
       df[i, "from"] <- output_source[i]
       df[i, "to"] <- outputs_id[i]
       df[i, "port_from"] <- NA
       df[i, "port_to"] <- NA
-      df[i, "type"] <- stp_to_out_str
+      df[i, "type"] <- "step_to_output"
     }
   }
 
@@ -163,11 +156,10 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
 #'    ver
 #' )
 read_edges_steps <- function(steps_in, steps, cwl_version) {
-  if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
-  # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
-  if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
-  if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
-  if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str
+  if (cwl_version == "v1.0") sep <- "/"
+  if (cwl_version == "v1.1") sep <- "/"
+  if (cwl_version == "v1.2") sep <- "/"
+  if (cwl_version == "sbg:draft-2") sep <- "\\."
 
   df <- data.frame(
     "from" = character(),
@@ -182,16 +174,15 @@ read_edges_steps <- function(steps_in, steps, cwl_version) {
 
   # replacing every null with NA so that is.na() won't give logical(0)
   for (i in 1:length(steps_in)) {
-    steps_in[[i]][sapply(steps_in[[i]]$"source", is.null), source_str_gbl] <- NA
+    steps_in[[i]][sapply(steps_in[[i]]$"source", is.null), "source"] <- NA
   }
-
 
   for (i in 1:length(steps_id)) {
     for (j in 1:nrow(steps_in[[i]])) {
-      key <- steps_in[[i]][j, id_str_gbl]
+      key <- steps_in[[i]][j, "id"]
       key_vec <- strsplit(key, sep)[[1]]
 
-      val <- unlist(steps_in[[i]][j, source_str_gbl])
+      val <- unlist(steps_in[[i]][j, "source"])
       # iterate over the value list (if any) because one
       # port j of node i could receive inputs from multiple upstream ports
       for (k in 1:length(val)) {

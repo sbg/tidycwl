@@ -26,6 +26,7 @@ get_cwl_version_steps <- function(steps) {
   ver <- NULL
   if (ver_1_0_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_0_str_gbl
   # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
+  print("Running.... [get_cwl_version_steps]")
   if (ver_1_1_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_1_str_gbl
   if (ver_1_2_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- ver_1_2_str_gbl
   if (sbg_draft_str_gbl %in% c(steps$run$cwlVersion, steps$cwlVersion)) ver <- sbg_draft_str_gbl
@@ -93,6 +94,7 @@ remove_underscores <- function(x) {
 read_edges_outputs <- function(output_source, outputs, cwl_version) {
   if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
   # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
+  print("Running.... [read_edges_outputs]")
   if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
   if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
   if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str
@@ -165,6 +167,7 @@ read_edges_outputs <- function(output_source, outputs, cwl_version) {
 read_edges_steps <- function(steps_in, steps, cwl_version) {
   if (cwl_version == ver_1_0_str_gbl) sep <- slash_str
   # Added if statements that set the ver variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
+  print("Running.... [read_edges_steps]")
   if (cwl_version == ver_1_1_str_gbl) sep <- slash_str
   if (cwl_version == ver_1_2_str_gbl) sep <- slash_str
   if (cwl_version == sbg_draft_str_gbl) sep <- dbl_slash_str

@@ -97,7 +97,6 @@ get_edges <- function(outputs, steps) {
 
   # edges from outputs
   if (ver == ver_1_0_str_gbl) source_name <- out_src_str
-    # Added if statements that set the source_name variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
   if (ver == ver_1_1_str_gbl) source_name <- out_src_str
   if (ver == ver_1_2_str_gbl) source_name <- out_src_str
   if (ver == sbg_draft_str_gbl) source_name <- source_str_gbl
@@ -115,7 +114,6 @@ get_edges <- function(outputs, steps) {
 
   # edges from steps
   if (ver == ver_1_0_str_gbl) in_name <- in_str
-    # Added if statements that set the in_name variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
   if (ver == ver_1_1_str_gbl) in_name <- in_str
   if (ver == ver_1_2_str_gbl) in_name <- in_str
   if (ver == sbg_draft_str_gbl) in_name <- "inputs"
