@@ -375,3 +375,115 @@ replace_labels_if_na <- function(lst) {
   }
   lst
 }
+
+#' check if object is an empty list or string
+#' 
+#' @param obj any object
+#'
+#' @return Logical. \code{TRUE} if it is an empty string or list, \code{FALSE} if not.
+#'
+#' @export check_if_empty
+#' 
+#' @examples
+#' li <- list("", "1", "Hello")
+#' check_if_empty(li)
+
+
+check_if_empty <- function(obj) {
+  obj_empty <- FALSE
+  if (is.list(obj)) {
+    if (length(obj) == 0) {
+      obj_empty <- TRUE
+    }
+  } else if (is.character(obj)) {
+    if (obj == "") {
+      obj_empty <- TRUE
+    } else if(obj == "git") {
+      obj_empty <- TRUE
+    }
+  } else {
+    print("Value is not a Character or List")
+  }
+  obj_empty
+}
+
+
+#' Fix BCO json to pass validation tests
+#' 
+#' @param path Path to JSON
+#'
+#' @return String containing JSON content
+#'
+#' @export cwl_to_bco_json
+#' 
+#' @examples
+#' json_path <- "path/to/file"
+#' cwl_to_bco_json(json_path)
+
+
+cwl_to_bco_json <- function(path) {
+  json_file <- RJSONIO::fromJSON(path)
+
+  #Fix Embargo Dates
+  embargo_list <- list("start_time" = json_file$provenance_domain$embargo[1], "end_time" = json_file$provenance_domain$embargo[2])
+  json_file$provenance_domain$embargo <- embargo_list
+  
+  #Fix usability domain
+  usability_dom_list <- list(json_file$usability_domain)
+  json_file$usability_domain <- usability_dom_list
+  
+  #Fix platform domain
+  platform_list <- list(json_file$description_domain$platform)
+  json_file$description_domain$platform <- platform_list
+  
+  
+  #Fix pipeline steps
+  step_length <- length(json_file$description_domain$pipeline_steps)
+  
+  for (i in 1:step_length) {
+    json_file$description_domain$pipeline_steps[[i]]$step_number <- as.integer(json_file$description_domain$pipeline_steps[[i]]$step_number)
+  }
+  
+  #Fix empirical error
+  
+  if (is.list(json_file$error_domain$empirical_error)) {
+    empirical_err_list <- fromJSON('{}')
+    json_file$error_domain$empirical_error <- empirical_err_list
+  }
+  
+  #Fix algorithmic error
+  
+  if (is.list(json_file$error_domain$algorithmic_error)) {
+    algo_err_list <- fromJSON('{}')
+    json_file$error_domain$algorithmic_error <- algo_err_list
+  }
+  
+  #Fix output subdomain
+  output_sub_list <- list("uri"=json_file$io_domain$output_subdomain[[1]]$uri[[1]]['uri'][[1]], "access_time"=json_file$io_domain$output_subdomain[[1]]$uri[[1]]['access_time'][[1]])
+  json_file$io_domain$output_subdomain[[1]]$uri <- output_sub_list
+  
+  #Fix input subdomain
+  input_sub_list <- list("uri"=json_file$io_domain$input_subdomain[[1]]$uri[[1]]['uri'][[1]], "filename"=json_file$io_domain$input_subdomain[[1]]$uri[[1]]['filename'][[1]], "access_time"=json_file$io_domain$input_subdomain[[1]]$uri[[1]]['access_time'][[1]])
+  json_file$io_domain$input_subdomain[[1]]$uri <- input_sub_list
+  
+  #Fix env vars
+  if(is.list(json_file$execution_domain$environment_variables)) {
+    env_vars_list <- fromJSON('{}')
+    json_file$execution_domain$environment_variables <- env_vars_list
+  }
+  
+  #Fix execution_domain script
+  
+  script_list <- list(json_file$execution_domain$script)
+  json_file$execution_domain$script <- script_list
+  
+  #Fix extension_domain
+  
+  true_all <- all(lapply(json_file$extension_domain$scm_extension, check_if_empty))
+  
+  if (true_all) {
+    json_file$extension_domain <- NULL
+  }
+  
+  RJSONIO::toJSON(json_file, pretty=TRUE)
+}
