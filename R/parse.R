@@ -15,7 +15,7 @@
 #'   read_cwl(format = "json") %>%
 #'   parse_type()
 parse_type <- function(x) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
   trimws(x$class)
 }
 
@@ -32,7 +32,7 @@ parse_type <- function(x) {
 #'   read_cwl(format = "json") %>%
 #'   parse_meta()
 parse_meta <- function(x) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
   sanitize_metadata_list(
     list(
       "id" = x$"id",
@@ -72,7 +72,7 @@ parse_meta <- function(x) {
 #'   parse_inputs() %>%
 #'   names()
 parse_inputs <- function(x, simplify = TRUE) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
 
   if (is.null(x$inputs)) {
     return(NULL)
@@ -114,7 +114,7 @@ parse_inputs <- function(x, simplify = TRUE) {
 #'   parse_outputs() %>%
 #'   names()
 parse_outputs <- function(x, simplify = TRUE) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
   if (is.null(x$outputs)) {
     return(NULL)
   }
@@ -155,7 +155,7 @@ parse_outputs <- function(x, simplify = TRUE) {
 #'   parse_steps() %>%
 #'   length()
 parse_steps <- function(x) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
   if (is.null(x$steps)) {
     return(NULL)
   }

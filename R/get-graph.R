@@ -1,3 +1,8 @@
+#' Changelog
+#' ---  Saul E. Acevedo 9/28/2022
+#'     --- Added support for CWL versions 1.1 and 1.2
+
+
 #' Get nodes in a CWL workflow into a data frame
 #'
 #' @param inputs Parsed inputs
@@ -29,9 +34,9 @@ get_nodes <- function(inputs, outputs, steps) {
       get_steps_label(steps)
     ),
     "group" = c(
-      rep("input", length(get_inputs_id(inputs))),
-      rep("output", length(get_outputs_id(outputs))),
-      rep("step", length(get_steps_id(steps)))
+      rep(input_str_gbl, length(get_inputs_id(inputs))),
+      rep(output_str_gbl, length(get_outputs_id(outputs))),
+      rep(step_str_gbl, length(get_steps_id(steps)))
     ),
     stringsAsFactors = FALSE
   )
@@ -88,10 +93,14 @@ get_nodes <- function(inputs, outputs, steps) {
 get_edges <- function(outputs, steps) {
   # edges - only need to look into outputs and steps
   ver <- get_cwl_version_steps(steps)
+  out_src_str <- "outputSource"
 
   # edges from outputs
-  if (ver == "v1.0") source_name <- "outputSource"
-  if (ver == "sbg:draft-2") source_name <- "source"
+  if (ver == ver_1_0_str_gbl) source_name <- out_src_str
+    # Added if statements that set the source_name variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
+  if (ver == ver_1_1_str_gbl) source_name <- out_src_str
+  if (ver == ver_1_2_str_gbl) source_name <- out_src_str
+  if (ver == sbg_draft_str_gbl) source_name <- source_str_gbl
 
   if (is_cwl_dict(outputs)) {
     output_source <- unlist(outputs[[source_name]])
@@ -102,10 +111,14 @@ get_edges <- function(outputs, steps) {
   }
 
   df_edges_outputs <- read_edges_outputs(output_source, outputs, ver)
+  in_str <- "in"
 
   # edges from steps
-  if (ver == "v1.0") in_name <- "in"
-  if (ver == "sbg:draft-2") in_name <- "inputs"
+  if (ver == ver_1_0_str_gbl) in_name <- in_str
+    # Added if statements that set the in_name variable for CWL versions 1.1 and 1.2. S.E.A, 9/28/2022
+  if (ver == ver_1_1_str_gbl) in_name <- in_str
+  if (ver == ver_1_2_str_gbl) in_name <- in_str
+  if (ver == sbg_draft_str_gbl) in_name <- "inputs"
 
   if (is_cwl_dict(steps)) {
     steps_in <- steps[[in_name]]

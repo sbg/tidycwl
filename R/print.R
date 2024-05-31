@@ -16,7 +16,7 @@
 #' flow <- read_cwl(path, format = "json")
 #' flow
 print.cwl <- function(x, ...) {
-  if (!is_cwl(x)) stop("not a CWL object")
+  if (!is_cwl(x)) stop(not_cwl_obj_str_gbl)
   cat("Name:", x$label, "\n")
   cat("Class:", x$class, "\n")
   cat("CWL Version:", x$cwlVersion, "\n")
