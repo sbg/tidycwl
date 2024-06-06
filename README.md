@@ -26,6 +26,8 @@ Or try the development version on GitHub:
 remotes::install_github("sbg/tidycwl")
 ```
 
+Note: The most up to date code version is contained in this repository, and is not available for install in CRAN. It is recommended you install the development version contained in this repo for features that account for newer versions of CWL.
+
 ## Copyright
 
 © 2020 Seven Bridges Genomics, Inc. All rights reserved.
